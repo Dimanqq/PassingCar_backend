@@ -1,7 +1,6 @@
 package nsu.fit.passing_car_backend;
 
 public class ServerUtils {
-    SQLConnection sqlConnection;
-
-
+    public SQLConnection sqlConnection;
+    public static final String SUCCESS_RESPONSE = "success";
 }

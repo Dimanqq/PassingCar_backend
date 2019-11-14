@@ -32,6 +32,8 @@ public class CreationHandler implements HttpHandler {
         JSONObject o = (JSONObject) jsonParser.parse(reader);
         String name = (String) o.get("name");
         Long cnt = (Long) o.get("cnt");
-        exchange.getResponseSender().send(name + " " + cnt);
+        serverUtils.sqlConnection.addUser(name, cnt.intValue());
+        exchange.getResponseSender().send(ServerUtils.SUCCESS_RESPONSE);
+
     }
 }
