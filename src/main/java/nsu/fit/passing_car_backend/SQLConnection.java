@@ -25,11 +25,22 @@ public class SQLConnection {
 
     void initDB() throws SQLException {
         runSQL("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"");
-        runSQL("CREATE TABLE \"image\" (\n" +
+        runSQL("CREATE TABLE IF NOT EXISTS \"image\" (\n" +
                 "\"id\" uuid NOT NULL DEFAULT uuid_generate_v1(),\n" +
                 "\"mime_type\" varchar(30) NOT NULL,\n" +
                 "\"data\" bytea NOT NULL,\n" +
                 "CONSTRAINT \"image_pk\" PRIMARY KEY (\"id\")\n" +
+                ")");
+        runSQL("CREATE TABLE IF NOT EXISTS \"user\" (\n" +
+                "\"email\" varchar(100) NOT NULL UNIQUE,\n" +
+                "\"password\" varchar(100) NOT NULL,\n" +
+                "\"first_name\" varchar(100) NOT NULL,\n" +
+                "\"last_name\" varchar(100) NOT NULL,\n" +
+                "\"phone\" varchar(30) NOT NULL UNIQUE,\n" +
+                "\"id\" uuid NOT NULL DEFAULT uuid_generate_v1(),\n" +
+                "\"avatar_id\" uuid,\n" +
+                "CONSTRAINT \"user_pk\" PRIMARY KEY (\"id\"),\n" +
+                "CONSTRAINT \"user_fk0\" FOREIGN KEY (\"avatar_id\") REFERENCES \"image\"(\"id\")\n" +
                 ")");
     }
 
@@ -65,7 +76,7 @@ public class SQLConnection {
 
     public boolean auth(String userId) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT user.id FROM user WHERE user.id = ?")) {
+                ("SELECT \"user\".id FROM \"user\" WHERE \"user\".id::text = ?")) {
             statement.setString(1, userId);
             return statement.executeQuery().next();
         }
@@ -73,7 +84,7 @@ public class SQLConnection {
 
     public String createImage(InputStream is, String mimeType) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement
-                (" INSERT INTO images (mime_type, data) VALUES (?, ?) RETURNING id")) {
+                (" INSERT INTO image (mime_type, data) VALUES (?, ?) RETURNING id")) {
             statement.setString(1, mimeType);
             statement.setBinaryStream(2, is);
             ResultSet res = statement.executeQuery();
@@ -82,9 +93,9 @@ public class SQLConnection {
         }
     }
 
-    public String registerUser(String email, String passw, String firstName, String lastName,  String phone) throws SQLException {
+    public String registerUser(String email, String passw, String firstName, String lastName, String phone) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement
-                (" INSERT INTO users (email, password, first_name, last_name, phone) VALUES (?, ?, ?, ?, ?) RETURNING id")) {
+                (" INSERT INTO \"user\" (email, \"password\", first_name, last_name, phone) VALUES (?, ?, ?, ?, ?) RETURNING id")) {
             statement.setString(1, email);
             statement.setString(2, passw);
             statement.setString(3, firstName);
@@ -99,7 +110,7 @@ public class SQLConnection {
     public JSONObject getUser(String userId) throws SQLException {
         JSONObject user;
         try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT user.id FROM user WHERE user.id = ?")) {
+                ("SELECT \"user\".id FROM \"user\" WHERE user.id = ?")) {
             statement.setString(1, userId);
             ResultSet res = statement.executeQuery();   //  todo user might be not found
             user = new JSONObject();
@@ -109,6 +120,20 @@ public class SQLConnection {
             user.put("last_name", res.getString(4));
             user.put("phone", res.getString(5));
             return user;
+        }
+    }
+
+    public ImageData getImage(String imageId) throws SQLException {
+        JSONObject user;
+        try (PreparedStatement statement = connection.prepareStatement
+                ("SELECT image.mime_type, image.data FROM image WHERE image.id::text = ?")) {
+            statement.setString(1, imageId);
+            ResultSet res = statement.executeQuery();   //  todo image might be not found
+            res.next();
+            ImageData imageData = new ImageData();
+            imageData.mimeType = res.getString(1);
+            imageData.data = res.getBinaryStream(2);
+            return imageData;
         }
     }
 }

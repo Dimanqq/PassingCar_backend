@@ -35,6 +35,14 @@ public class Main {
                 .post("/create/ride", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new CreateRideHandler(serverUtils))))
+                .get("/users/{id}", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new GetUserHandler(serverUtils))
+                ))
+                .get("/images/{id}", /*new AuthorizationHandler(*/
+                        //     serverUtils,
+                        new BlockingHandler(new GetImageHandler(serverUtils))
+                )//)
                 ;
 
         Undertow server = Undertow.builder().addHttpListener(8080,

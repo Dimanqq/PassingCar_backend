@@ -34,7 +34,7 @@ public class RegistrationHandler implements HttpHandler {
         String id = serverUtils.sqlConnection.registerUser(firstName, lastName, passw, phone, email);
         JSONObject idObject = new JSONObject();
         idObject.put("user_id", id);
-        exchange.setStatusCode(200);
+        exchange.setStatusCode(201);
         exchange.getResponseSender().send(idObject.toString());
     }
 }
