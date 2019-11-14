@@ -4,7 +4,6 @@ import io.undertow.server.BlockingHttpExchange;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import nsu.fit.passing_car_backend.ServerUtils;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -23,11 +22,14 @@ public class CreationHandler implements HttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         BlockingHttpExchange exchange2 = exchange.startBlocking();
-        if(exchange2 == null){
+        if (exchange2 == null) {
             exchange.getResponseSender().send("null");
             return;
         }
-        Reader reader = new BufferedReader(new InputStreamReader(exchange2.getInputStream(), StandardCharsets.UTF_8));
+        Reader reader = new BufferedReader(new InputStreamReader(
+                exchange2.getInputStream(),
+                StandardCharsets.UTF_8
+        ));
         JSONParser jsonParser = new JSONParser();
         JSONObject o = (JSONObject) jsonParser.parse(reader);
         String name = (String) o.get("name");

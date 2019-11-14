@@ -13,17 +13,15 @@ public class Main {
     public static void main(String[] args) {
         final ServerUtils serverUtils;
         SQLCreds creds = new SQLCreds();
-        creds.db = "passing_car";
         creds.ip = "192.168.43.17";
-        creds.password = "1234";
         creds.port = 5433;
+        creds.db = "passing_car";
         creds.user = "postgres";
+        creds.password = "1234";
         try {
             serverUtils = new ServerUtils();
             serverUtils.sqlConnection = new SQLConnection(creds);
-//            ResultSet rs = c.prepareStatement("SELECT * FROM test_table").executeQuery();
-//            rs.next();
-//            System.out.println(rs.getString(2));
+            serverUtils.sqlConnection.initDB();
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
             return;
