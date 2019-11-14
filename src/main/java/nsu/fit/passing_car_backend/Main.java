@@ -32,9 +32,10 @@ public class Main {
         HttpHandler mainHandler = Handlers.routing()
                 .get("/users", new UserListHandler(serverUtils))
                 .post("/new_user", new BlockingHandler(new CreationHandler(serverUtils)))
-                .post("/create/image", new BlockingHandler(new AuthorizationHandler(
-                        serverUtils, new CreateImageHandler(serverUtils)
-                )))
+                .post("/create/image", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new CreateImageHandler(serverUtils))
+                ))
                 ;
 
         Undertow server = Undertow.builder().addHttpListener(8080,
