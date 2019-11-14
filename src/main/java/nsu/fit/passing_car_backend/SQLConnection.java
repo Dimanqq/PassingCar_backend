@@ -3,6 +3,7 @@ package nsu.fit.passing_car_backend;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.io.InputStream;
 import java.sql.*;
 
 public class SQLConnection {
@@ -23,14 +24,13 @@ public class SQLConnection {
     }
 
     void initDB() throws SQLException {
-        runSQL("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";\n" +
-                "\n" +
-                "CREATE TABLE IF NOT EXISTS test_table (\n" +
-                "id UUID NOT NULL DEFAULT uuid_generate_v1(),\n" +
-                "name VARCHAR(100),\n" +
-                "cnt INTEGER,\n" +
-                "CONSTRAINT test_table_id PRIMARY KEY (id)\n" +
-                ");");
+        runSQL("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"");
+        runSQL("CREATE TABLE \"image\" (\n" +
+                "\"id\" uuid NOT NULL DEFAULT uuid_generate_v1(),\n" +
+                "\"mime_type\" varchar(30) NOT NULL,\n" +
+                "\"data\" bytea NOT NULL,\n" +
+                "CONSTRAINT \"image_pk\" PRIMARY KEY (\"id\")\n" +
+                ")");
     }
 
     public void addUser(String name, int cnt) throws SQLException {
@@ -68,6 +68,47 @@ public class SQLConnection {
                 ("SELECT user.id FROM user WHERE user.id = ?")) {
             statement.setString(1, userId);
             return statement.executeQuery().next();
+        }
+    }
+
+    public String createImage(InputStream is, String mimeType) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement
+                (" INSERT INTO images (mime_type, data) VALUES (?, ?) RETURNING id")) {
+            statement.setString(1, mimeType);
+            statement.setBinaryStream(2, is);
+            ResultSet res = statement.executeQuery();
+            res.next();
+            return res.getString(1);
+        }
+    }
+
+    public String registerUser(String email, String passw, String firstName, String lastName,  String phone) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement
+                (" INSERT INTO users (email, password, first_name, last_name, phone) VALUES (?, ?, ?, ?, ?) RETURNING id")) {
+            statement.setString(1, email);
+            statement.setString(2, passw);
+            statement.setString(3, firstName);
+            statement.setString(4, lastName);
+            statement.setString(5, phone);
+            ResultSet res = statement.executeQuery();
+            res.next();
+            return res.getString(1);
+        }
+    }
+
+    public JSONObject getUser(String userId) throws SQLException {
+        JSONObject user;
+        try (PreparedStatement statement = connection.prepareStatement
+                ("SELECT user.id FROM user WHERE user.id = ?")) {
+            statement.setString(1, userId);
+            ResultSet res = statement.executeQuery();   //  todo user might be not found
+            user = new JSONObject();
+            user.put("email", res.getString(1));
+            user.put("password", res.getString(2));
+            user.put("first_name", res.getString(3));
+            user.put("last_name", res.getString(4));
+            user.put("phone", res.getString(5));
+            return user;
         }
     }
 }

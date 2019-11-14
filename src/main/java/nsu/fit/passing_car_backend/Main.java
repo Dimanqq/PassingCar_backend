@@ -4,10 +4,7 @@ import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.BlockingHandler;
-import nsu.fit.passing_car_backend.handlers.AuthorizationHandler;
-import nsu.fit.passing_car_backend.handlers.CreateImageHandler;
-import nsu.fit.passing_car_backend.handlers.CreationHandler;
-import nsu.fit.passing_car_backend.handlers.UserListHandler;
+import nsu.fit.passing_car_backend.handlers.*;
 
 import java.sql.SQLException;
 
@@ -30,12 +27,14 @@ public class Main {
         }
 
         HttpHandler mainHandler = Handlers.routing()
-                .get("/users", new UserListHandler(serverUtils))
-                .post("/new_user", new BlockingHandler(new CreationHandler(serverUtils)))
                 .post("/create/image", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new CreateImageHandler(serverUtils))
                 ))
+                .post("/create/user", new BlockingHandler(new RegistrationHandler(serverUtils)))
+                .post("/create/ride", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new CreateRideHandler(serverUtils))))
                 ;
 
         Undertow server = Undertow.builder().addHttpListener(8080,
