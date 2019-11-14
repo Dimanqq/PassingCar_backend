@@ -4,6 +4,8 @@ import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.BlockingHandler;
+import nsu.fit.passing_car_backend.handlers.AuthorizationHandler;
+import nsu.fit.passing_car_backend.handlers.CreateImageHandler;
 import nsu.fit.passing_car_backend.handlers.CreationHandler;
 import nsu.fit.passing_car_backend.handlers.UserListHandler;
 
@@ -29,7 +31,11 @@ public class Main {
 
         HttpHandler mainHandler = Handlers.routing()
                 .get("/users", new UserListHandler(serverUtils))
-                .post("/new_user", new BlockingHandler(new CreationHandler(serverUtils)));
+                .post("/new_user", new BlockingHandler(new CreationHandler(serverUtils)))
+                .post("/create/image", new BlockingHandler(new AuthorizationHandler(
+                        serverUtils, new CreateImageHandler(serverUtils)
+                )))
+                ;
 
         Undertow server = Undertow.builder().addHttpListener(8080,
                 "0.0.0.0").setHandler(mainHandler).build();

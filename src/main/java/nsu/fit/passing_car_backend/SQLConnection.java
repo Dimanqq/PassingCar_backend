@@ -62,4 +62,12 @@ public class SQLConnection {
         }
         return users;
     }
+
+    public boolean auth(String userId) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement
+                ("SELECT user.id FROM user WHERE user.id = ?")) {
+            statement.setString(1, userId);
+            return statement.executeQuery().next();
+        }
+    }
 }
