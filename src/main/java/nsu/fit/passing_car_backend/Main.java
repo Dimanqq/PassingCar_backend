@@ -31,10 +31,16 @@ public class Main {
                         serverUtils,
                         new BlockingHandler(new CreateImageHandler(serverUtils))
                 ))
-                .post("/create/user", new BlockingHandler(new RegistrationHandler(serverUtils)))
+                .post("/create/user", new BlockingHandler(new RegistrationHandler(serverUtils)
+                ))
+                .post("/rides/{id}/invite", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new InviteRideHandler(serverUtils))
+                ))
                 .post("/create/ride", new AuthorizationHandler(
                         serverUtils,
-                        new BlockingHandler(new CreateRideHandler(serverUtils))))
+                        new BlockingHandler(new CreateRideHandler(serverUtils))
+                ))
                 .get("/users/{id}", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new GetUserHandler(serverUtils))
@@ -43,7 +49,18 @@ public class Main {
                         //     serverUtils,
                         new BlockingHandler(new GetImageHandler(serverUtils))
                 )//)
-                ;
+                .get("/riders/{id}", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new GetRiderHandler(serverUtils))
+                ))
+                .get("/search", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new SearchHandler(serverUtils))
+                ))
+                .delete("/rides/{id}/invite", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new DeleteInviteHandler(serverUtils))
+                ));
 
         Undertow server = Undertow.builder().addHttpListener(8080,
                 "0.0.0.0").setHandler(mainHandler).build();
