@@ -196,8 +196,9 @@ public class SQLConnection {
     }
 
 
-    public boolean joinRide(String userId, String rideId) throws SQLException {
-        int count;
+    public int joinRide(String userId, String rideId) throws SQLException {
+        int count, places;
+        //check repeatable invite query
         try (PreparedStatement statement = connection.prepareStatement
                 ("SELECT COUNT(*) FROM image WHERE " +
                         "m2m_ride_user.user_id::text = ? AND m2m_ride_user.ride_id::text = ?")) {
@@ -207,8 +208,10 @@ public class SQLConnection {
             res.next();
             count = Integer.parseInt(res.getString(1));
             if (count > 0)
-                return false;
+                return -1;
         }
+
+        //check count of users who already take part in this trip
         try (PreparedStatement statement = connection.prepareStatement
                 ("SELECT COUNT (*) FROM image WHERE m2m_ride_user.ride_id::text = ?")) {
             statement.setString(1, rideId);
@@ -217,14 +220,36 @@ public class SQLConnection {
             count = Integer.parseInt(res.getString(1));
         }
 
+        //get max count of users in this pass
+        try (PreparedStatement statement = connection.prepareStatement
+                ("SELECT ride.places_count FROM ride WHERE ride.id::text = ?")) {
+            statement.setString(1, rideId);
+            ResultSet res = statement.executeQuery();
+            res.next();
+            places = Integer.parseInt(res.getString(1));
+        }
+
+        //if this user is first
         if (count == 0) {
             try (PreparedStatement statement = connection.prepareStatement
-                    ("INSERT INTO \"m2m_ride_user\" (ride_id) VALUES (?) RETURNING id")) {
-                ResultSet res = statement.executeQuery();
-                res.next();
-                //id = res.getString(1);
+                    ("INSERT INTO \"m2m_ride_user\" (user_id, ride_id) VALUES (?, ?)")) {
+                statement.setString(1, userId);
+                statement.setString(2, rideId);
+                statement.executeQuery();
             }
         }
-        return false;
+
+        //count with new user
+        count++;
+
+        int freeCount = places - count;
+
+        try (PreparedStatement statement = connection.prepareStatement
+                ("UPDATE \"ride\" SET ride.places_count = ? WHERE ride.id::text = ?")) {
+            statement.setInt(1, freeCount);
+            statement.setString(2, rideId);
+            statement.executeQuery();
+        }
+        return freeCount;
     }
 }
