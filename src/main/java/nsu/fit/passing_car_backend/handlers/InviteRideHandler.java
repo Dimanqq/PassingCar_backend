@@ -29,9 +29,10 @@ public class InviteRideHandler implements HttpHandler {
         JSONParser jsonParser = new JSONParser();
         JSONObject o = (JSONObject) jsonParser.parse(reader);
         String rideId = (String) o.get("ride_id");
-        if (serverUtils.sqlConnection.joinRide(userId, rideId)){
+        int places = serverUtils.sqlConnection.joinRide(userId, rideId);
+        if (places != -1){
             exchange.setStatusCode(201);
-            exchange.getResponseSender().send("{\"result\":\"ok\"}");
+            exchange.getResponseSender().send("{\"result\":\"" + places +"\"}");
         } else {
             exchange.setStatusCode(200);
             exchange.getResponseSender().send("{\"result\":\"exists\"}");
