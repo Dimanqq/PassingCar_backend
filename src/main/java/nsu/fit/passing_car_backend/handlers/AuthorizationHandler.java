@@ -17,7 +17,7 @@ public class AuthorizationHandler implements HttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         HeaderValues headerValues = exchange.getRequestHeaders().get("Authorization");
-        if (headerValues == null) {
+            if (headerValues == null) {
             exchange.setStatusCode(401);
             exchange.getResponseSender().send("No token");
             return;

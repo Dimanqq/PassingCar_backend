@@ -1,6 +1,5 @@
 package nsu.fit.passing_car_backend.handlers;
 
-import io.undertow.server.BlockingHttpExchange;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import nsu.fit.passing_car_backend.ServerUtils;
@@ -12,30 +11,23 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
-public class CreationHandler implements HttpHandler {
+public class SigninHandler implements HttpHandler{
     private ServerUtils serverUtils;
 
-    public CreationHandler(ServerUtils serverUtils) {
+    public SigninHandler(ServerUtils serverUtils) {
         this.serverUtils = serverUtils;
     }
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        BlockingHttpExchange exchange2 = exchange.startBlocking();
-        if (exchange2 == null) {
-            exchange.getResponseSender().send("null");
-            return;
-        }
         Reader reader = new BufferedReader(new InputStreamReader(
-                exchange2.getInputStream(),
+                exchange.getInputStream(),
                 StandardCharsets.UTF_8
         ));
         JSONParser jsonParser = new JSONParser();
         JSONObject o = (JSONObject) jsonParser.parse(reader);
-        String name = (String) o.get("name");
-        Long cnt = (Long) o.get("cnt");
-        serverUtils.sqlConnection.addUser(name, cnt.intValue());
-        exchange.getResponseSender().send(ServerUtils.SUCCESS_RESPONSE);
+        String passw = (String) o.get("password");
+        String phone = (String) o.get("phone");
 
     }
 }

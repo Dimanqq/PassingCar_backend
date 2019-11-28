@@ -2,6 +2,7 @@ package nsu.fit.passing_car_backend.handlers;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.ServerUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -31,10 +32,14 @@ public class RegistrationHandler implements HttpHandler {
         String passw = (String) o.get("password");
         String phone = (String) o.get("phone");
         String email = (String) o.get("email");
-        String id = serverUtils.sqlConnection.registerUser(firstName, lastName, passw, phone, email);
-        JSONObject idObject = new JSONObject();
-        idObject.put("user_id", id);
-        exchange.setStatusCode(201);
-        exchange.getResponseSender().send(idObject.toString());
+        try {
+            String id = serverUtils.sqlConnection.registerUser(firstName, lastName, passw, phone, email);
+            JSONObject idObject = new JSONObject();
+            idObject.put("user_id", id);
+            exchange.setStatusCode(201);
+            exchange.getResponseSender().send(idObject.toString());
+        } catch(DataError e){
+            e.send(exchange);
+        }
     }
 }

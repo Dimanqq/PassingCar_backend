@@ -2,6 +2,7 @@ package nsu.fit.passing_car_backend;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.postgresql.util.PSQLException;
 
 import java.io.InputStream;
 import java.sql.*;
@@ -42,38 +43,37 @@ public class SQLConnection {
                 "CONSTRAINT \"user_pk\" PRIMARY KEY (\"id\"),\n" +
                 "CONSTRAINT \"user_fk0\" FOREIGN KEY (\"avatar_id\") REFERENCES \"image\"(\"id\")\n" +
                 ")");
-        //runSQL();
+        runSQL("CREATE TABLE IF NOT EXISTS point (\n" +
+                "id uuid NOT NULL DEFAULT uuid_generate_v1(),\n" +
+                "lat float NOT NULL,\n" +
+                "lon float NOT NULL,\n" +
+                "CONSTRAINT point_pk PRIMARY KEY (id)\n" +
+                ")");
+        runSQL("CREATE TABLE IF NOT EXISTS ride (\n" +
+                "id uuid NOT NULL DEFAULT uuid_generate_v1(),\n" +
+                "point_start uuid NOT NULL,\n" +
+                "point_end uuid NOT NULL,\n" +
+                "time_start timestamptz NOT NULL,\n" +
+                "places_count integer NOT NULL,\n" +
+                "creator_id uuid NOT NULL,\n" +
+                "CONSTRAINT ride_pk PRIMARY KEY (id),\n" +
+                "CONSTRAINT ride_point_start FOREIGN KEY (point_start)\n" +
+                "REFERENCES point(id),\n" +
+                "CONSTRAINT ride_point_end FOREIGN KEY (point_end)\n" +
+                "REFERENCES point(id),\n" +
+                "CONSTRAINT ride_creator_id FOREIGN KEY (creator_id)\n" +
+                "REFERENCES \"user\"(id)\n" +
+                ")");
+        runSQL("CREATE TABLE IF NOT EXISTS m2m_ride_user (\n" +
+                "user_id uuid NOT NULL,\n" +
+                "ride_id uuid NOT NULL,\n" +
+                "CONSTRAINT m2m_ride_user_user_id FOREIGN KEY (user_id)\n" +
+                "REFERENCES \"user\"(id),\n" +
+                "CONSTRAINT m2m_ride_user_ride_id FOREIGN KEY (ride_id)\n" +
+                "REFERENCES ride(id)\n" +
+                ")");
     }
 
-    public void addUser(String name, int cnt) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement
-                ("INSERT INTO test_table (name, cnt) VALUES (?,?)")) {
-            statement.setString(1, name);
-            statement.setInt(2, cnt);
-            statement.executeUpdate();
-        }
-    }
-
-    public JSONObject getUserList() throws SQLException {
-        JSONObject users;
-        try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT test_table.name, test_table.cnt, test_table.id FROM test_table")) {
-            ResultSet res = statement.executeQuery();
-
-            JSONArray usersArr = new JSONArray();
-            users = new JSONObject();
-
-            while (res.next()) {
-                JSONObject user = new JSONObject();
-                user.put("name", res.getString(1));
-                user.put("cnt", res.getString(2));
-                user.put("id", res.getString(3));
-                usersArr.add(user);
-            }
-            users.put("users", usersArr);
-        }
-        return users;
-    }
 
     public boolean auth(String userId) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement
@@ -94,9 +94,11 @@ public class SQLConnection {
         }
     }
 
-    public String registerUser(String email, String passw, String firstName, String lastName, String phone) throws SQLException {
+    public String registerUser(String firstName, String lastName, String passw, String phone, String email) throws SQLException, DataError {
         try (PreparedStatement statement = connection.prepareStatement
-                (" INSERT INTO \"user\" (email, \"password\", first_name, last_name, phone) VALUES (?, ?, ?, ?, ?) RETURNING id")) {
+                (" INSERT INTO \"user\" (" +
+                        "email, \"password\", first_name, last_name, phone" +
+                    ") VALUES (?, ?, ?, ?, ?) RETURNING id")) {
             statement.setString(1, email);
             statement.setString(2, passw);
             statement.setString(3, firstName);
@@ -105,6 +107,8 @@ public class SQLConnection {
             ResultSet res = statement.executeQuery();
             res.next();
             return res.getString(1);
+        } catch (PSQLException e){
+            throw new DataError(DataError.DUPLICATE, e.getServerErrorMessage().toString());
         }
     }
 
@@ -137,16 +141,16 @@ public class SQLConnection {
         }
     }
 
-    public String createRide(String lonStart, String latStart, String lonFinish, String latFinish, String time, String placesFree, String creatorId) throws SQLException {
+    public String createRide(Double lonStart, Double latStart, Double lonFinish, Double latFinish, String time, Integer placesFree, String creatorId) throws SQLException {
         String startId = insertPoint(lonStart, latStart);
         String finishId = insertPoint(lonFinish, latFinish);
 
         try (PreparedStatement statement = connection.prepareStatement
-                (" INSERT INTO \"ride\" (point_start, point_end, time_start, places_count, creator_id) VALUES (?, ?, ?, ?, ?) RETURNING id")) {
+                (" INSERT INTO \"ride\" (point_start, point_end, time_start, places_count, creator_id) VALUES (?::uuid, ?::uuid, ?::timestamptz, ?, ?::uuid) RETURNING id")) {
             statement.setString(1, startId);
             statement.setString(2, finishId);
-            statement.setDate(3, Date.valueOf(time));
-            statement.setString(4, placesFree);
+            statement.setString(3, time);
+            statement.setInt(4, placesFree);
             statement.setString(5, creatorId);
             ResultSet res = statement.executeQuery();
             res.next();
@@ -154,12 +158,12 @@ public class SQLConnection {
         }
     }
 
-    private String insertPoint(String lonFinish, String latFinish) throws SQLException {
+    private String insertPoint(Double lonFinish, Double latFinish) throws SQLException {
         String id;
         try (PreparedStatement statement = connection.prepareStatement
-                (" INSERT INTO \"point\" (lat, lon) VALUES (?, ?) RETURNING id")) {
-            statement.setDouble(1, Double.valueOf(latFinish));
-            statement.setDouble(2, Double.valueOf(lonFinish));
+                ("INSERT INTO \"point\" (lat, lon) VALUES (?, ?) RETURNING id")) {
+            statement.setDouble(1, latFinish);
+            statement.setDouble(2, lonFinish);
             ResultSet res = statement.executeQuery();
             res.next();
             id = res.getString(1);
@@ -168,4 +172,50 @@ public class SQLConnection {
     }
 
 
+    public int joinRide(String userId, String rideId) throws SQLException {
+        int count, places;
+        //check repeatable invite query
+        try (PreparedStatement statement = connection.prepareStatement
+                ("SELECT COUNT(*) FROM m2m_ride_user WHERE " +
+                        "m2m_ride_user.user_id::text = ? AND m2m_ride_user.ride_id::text = ?")) {
+            statement.setString(1, userId);
+            statement.setString(2, rideId);
+            ResultSet res = statement.executeQuery();
+            res.next();
+            count = Integer.parseInt(res.getString(1));
+            if (count > 0)
+                return -1;
+        }
+
+        //check count of users who already take part in this trip
+        try (PreparedStatement statement = connection.prepareStatement
+                ("SELECT COUNT (*) FROM m2m_ride_user WHERE m2m_ride_user.ride_id::text = ?")) {
+            statement.setString(1, rideId);
+            ResultSet res = statement.executeQuery();
+            res.next();
+            count = Integer.parseInt(res.getString(1));
+        }
+
+        //get max count of users in this pass
+        try (PreparedStatement statement = connection.prepareStatement
+                ("SELECT ride.places_count FROM ride WHERE ride.id::text = ?")) {
+            statement.setString(1, rideId);
+            ResultSet res = statement.executeQuery();
+            res.next();
+            places = Integer.parseInt(res.getString(1));
+        }
+
+        //if this user is first
+        try (PreparedStatement statement = connection.prepareStatement
+                ("INSERT INTO \"m2m_ride_user\" (user_id, ride_id) VALUES (?::uuid, ?::uuid)")) {
+            statement.setString(1, userId);
+            statement.setString(2, rideId);
+            statement.execute();
+        }
+
+        //count with new user
+        count++;
+
+        return places - count;
+    }
 }

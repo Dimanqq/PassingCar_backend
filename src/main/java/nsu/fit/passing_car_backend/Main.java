@@ -7,6 +7,9 @@ import io.undertow.server.handlers.BlockingHandler;
 import nsu.fit.passing_car_backend.handlers.*;
 
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class Main {
     public static void main(String[] args) {
@@ -33,6 +36,8 @@ public class Main {
                 ))
                 .post("/create/user", new BlockingHandler(new RegistrationHandler(serverUtils)
                 ))
+                .post("/signin", new BlockingHandler(new SigninHandler(serverUtils)
+                ))
                 .post("/rides/{id}/invite", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new InviteRideHandler(serverUtils))
@@ -51,7 +56,7 @@ public class Main {
                 )//)
                 .get("/riders/{id}", new AuthorizationHandler(
                         serverUtils,
-                        new BlockingHandler(new GetRiderHandler(serverUtils))
+                        new BlockingHandler(new GetRideHandler(serverUtils))
                 ))
                 .get("/search", new AuthorizationHandler(
                         serverUtils,
