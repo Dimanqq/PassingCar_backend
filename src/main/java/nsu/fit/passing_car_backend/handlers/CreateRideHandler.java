@@ -26,16 +26,16 @@ public class CreateRideHandler implements HttpHandler {
         ));
         JSONParser jsonParser = new JSONParser();
         JSONObject o = (JSONObject) jsonParser.parse(reader);
-        String latStart = (String) o.get("lat_start");
-        String lonStart = (String) o.get("lon_start");
-        String latEnd = (String) o.get("lat_end");
-        String lonEnd = (String) o.get("lon_end");
+        Double latStart = (Double) o.get("lat_start");
+        Double lonStart = (Double) o.get("lon_start");
+        Double latEnd = (Double) o.get("lat_end");
+        Double lonEnd = (Double) o.get("lon_end");
         String timeStart = (String) o.get("time_start"); // todo time format?
-        String placesCount = (String) o.get("places_count");
-        String creatorId = (String) o.get("creator_id");
+        Integer placesCount = ((Long)o.get("places_count")).intValue();
+        String creatorId = exchange.getRequestHeaders().get("Authorization").getFirst();
         String rideId = serverUtils.sqlConnection.createRide(lonStart, latStart, lonEnd, latEnd, timeStart, placesCount, creatorId);
         JSONObject idObject = new JSONObject();
-        idObject.put("user_id", rideId);
+        idObject.put("ride_id", rideId);
         exchange.setStatusCode(201);
         exchange.getResponseSender().send(idObject.toString());
     }
