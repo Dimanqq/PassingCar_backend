@@ -185,7 +185,7 @@ public class SQLConnection {
     private String insertPoint(String lonFinish, String latFinish) throws SQLException {
         String id;
         try (PreparedStatement statement = connection.prepareStatement
-                (" INSERT INTO \"point\" (lat, lon) VALUES (?, ?) RETURNING id")) {
+                ("INSERT INTO \"point\" (lat, lon) VALUES (?, ?) RETURNING id")) {
             statement.setDouble(1, Double.valueOf(latFinish));
             statement.setDouble(2, Double.valueOf(lonFinish));
             ResultSet res = statement.executeQuery();
@@ -196,8 +196,19 @@ public class SQLConnection {
     }
 
 
-    public boolean joinRide(String rideId) throws SQLException {
+    public boolean joinRide(String userId, String rideId) throws SQLException {
         int count;
+        try (PreparedStatement statement = connection.prepareStatement
+                ("SELECT COUNT(*) FROM image WHERE " +
+                        "m2m_ride_user.user_id::text = ? AND m2m_ride_user.ride_id::text = ?")) {
+            statement.setString(1, userId);
+            statement.setString(2, rideId);
+            ResultSet res = statement.executeQuery();
+            res.next();
+            count = Integer.parseInt(res.getString(1));
+            if (count > 0)
+                return false;
+        }
         try (PreparedStatement statement = connection.prepareStatement
                 ("SELECT COUNT (*) FROM image WHERE m2m_ride_user.ride_id::text = ?")) {
             statement.setString(1, rideId);
@@ -208,7 +219,7 @@ public class SQLConnection {
 
         if (count == 0) {
             try (PreparedStatement statement = connection.prepareStatement
-                    (" INSERT INTO \"m2m_ride_user\" (ride_id) VALUES (?) RETURNING id")) {
+                    ("INSERT INTO \"m2m_ride_user\" (ride_id) VALUES (?) RETURNING id")) {
                 ResultSet res = statement.executeQuery();
                 res.next();
                 //id = res.getString(1);
