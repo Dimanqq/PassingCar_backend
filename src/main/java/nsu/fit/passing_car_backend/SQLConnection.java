@@ -196,7 +196,24 @@ public class SQLConnection {
     }
 
 
-    public boolean joinRide(String rideId) {
+    public boolean joinRide(String rideId) throws SQLException {
+        int count;
+        try (PreparedStatement statement = connection.prepareStatement
+                ("SELECT COUNT (*) FROM image WHERE m2m_ride_user.ride_id::text = ?")) {
+            statement.setString(1, rideId);
+            ResultSet res = statement.executeQuery();
+            res.next();
+            count = Integer.parseInt(res.getString(1));
+        }
+
+        if (count == 0) {
+            try (PreparedStatement statement = connection.prepareStatement
+                    (" INSERT INTO \"m2m_ride_user\" (ride_id) VALUES (?) RETURNING id")) {
+                ResultSet res = statement.executeQuery();
+                res.next();
+                //id = res.getString(1);
+            }
+        }
         return false;
     }
 }

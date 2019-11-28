@@ -12,7 +12,15 @@ public class InviteRideHandler implements HttpHandler {
     }
 
     @Override
-    public void handleRequest(HttpServerExchange httpServerExchange) throws Exception {
+    public void handleRequest(HttpServerExchange exchange) throws Exception {
+        String rideId = exchange.getQueryParameters().get("id").getFirst();
 
+        if (serverUtils.sqlConnection.joinRide(rideId)){
+            exchange.setStatusCode(201);
+            exchange.getResponseSender().send("{\"result\":\"ok\"}");
+        } else {
+            exchange.setStatusCode(200);
+            exchange.getResponseSender().send("{\"result\":\"exists\"}");
+        }
     }
 }

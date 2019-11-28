@@ -4,10 +4,10 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import nsu.fit.passing_car_backend.ServerUtils;
 
-public class GetRiderHandler implements HttpHandler {
+public class GetRideHandler implements HttpHandler {
     private ServerUtils serverUtils;
 
-    public GetRiderHandler(ServerUtils serverUtils) {
+    public GetRideHandler(ServerUtils serverUtils) {
         this.serverUtils = serverUtils;
     }
 
