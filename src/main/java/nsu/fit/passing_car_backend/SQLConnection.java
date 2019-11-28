@@ -96,7 +96,14 @@ public class SQLConnection {
     public String registerUser(String email, String passw, String firstName, String lastName, String phone) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement
                 (" INSERT INTO \"user\" (email, \"password\", first_name, last_name, phone) VALUES (?, ?, ?, ?, ?) RETURNING id")) {
-            return insert(email, passw, firstName, lastName, phone, statement);
+            statement.setString(1, email);
+            statement.setString(2, passw);
+            statement.setString(3, firstName);
+            statement.setString(4, lastName);
+            statement.setString(5, phone);
+            ResultSet res = statement.executeQuery();
+            res.next();
+            return res.getString(1);
         }
     }
 
@@ -129,21 +136,35 @@ public class SQLConnection {
         }
     }
 
-    public String createRide(String start, String finish, String time, String placesFree, String creatorId) throws SQLException {
+    public String createRide(String lonStart, String latStart, String lonFinish, String latFinish, String time, String placesFree, String creatorId) throws SQLException {
+        String startId = setLatLon(lonStart, latStart);
+        String finishId = setLatLon(lonFinish, latFinish);
+
         try (PreparedStatement statement = connection.prepareStatement
                 (" INSERT INTO \"ride\" (point_start, point_end, time_start, places_count, creator_id) VALUES (?, ?, ?, ?, ?) RETURNING id")) {
-            return insert(start, finish, time, placesFree, creatorId, statement);
+            statement.setString(1, startId);
+            statement.setString(2, finishId);
+            statement.setDate(3, Date.valueOf(time));
+            statement.setString(4, placesFree);
+            statement.setString(5, creatorId);
+            ResultSet res = statement.executeQuery();
+            res.next();
+            return res.getString(1);
         }
     }
 
-    private String insert(String start, String finish, String time, String placesFree, String creatorId, PreparedStatement statement) throws SQLException {
-        statement.setString(1, start);
-        statement.setString(2, finish);
-        statement.setString(3, time);
-        statement.setString(4, placesFree);
-        statement.setString(5, creatorId);
-        ResultSet res = statement.executeQuery();
-        res.next();
-        return res.getString(1);
+    private String setLatLon(String lonFinish, String latFinish) throws SQLException {
+        String id;
+        try (PreparedStatement statement = connection.prepareStatement
+                (" INSERT INTO \"point\" (lat, lon) VALUES (?, ?) RETURNING id")) {
+            statement.setDouble(1, Double.valueOf(latFinish));
+            statement.setDouble(2, Double.valueOf(lonFinish));
+            ResultSet res = statement.executeQuery();
+            res.next();
+            id = res.getString(1);
+        }
+        return id;
     }
+
+
 }
