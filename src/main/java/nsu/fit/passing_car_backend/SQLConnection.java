@@ -96,14 +96,7 @@ public class SQLConnection {
     public String registerUser(String email, String passw, String firstName, String lastName, String phone) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement
                 (" INSERT INTO \"user\" (email, \"password\", first_name, last_name, phone) VALUES (?, ?, ?, ?, ?) RETURNING id")) {
-            statement.setString(1, email);
-            statement.setString(2, passw);
-            statement.setString(3, firstName);
-            statement.setString(4, lastName);
-            statement.setString(5, phone);
-            ResultSet res = statement.executeQuery();
-            res.next();
-            return res.getString(1);
+            return insert(email, passw, firstName, lastName, phone, statement);
         }
     }
 
@@ -124,7 +117,6 @@ public class SQLConnection {
     }
 
     public ImageData getImage(String imageId) throws SQLException {
-        JSONObject user;
         try (PreparedStatement statement = connection.prepareStatement
                 ("SELECT image.mime_type, image.data FROM image WHERE image.id::text = ?")) {
             statement.setString(1, imageId);
@@ -135,5 +127,23 @@ public class SQLConnection {
             imageData.data = res.getBinaryStream(2);
             return imageData;
         }
+    }
+
+    public String createRide(String start, String finish, String time, String placesFree, String creatorId) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement
+                (" INSERT INTO \"ride\" (point_start, point_end, time_start, places_count, creator_id) VALUES (?, ?, ?, ?, ?) RETURNING id")) {
+            return insert(start, finish, time, placesFree, creatorId, statement);
+        }
+    }
+
+    private String insert(String start, String finish, String time, String placesFree, String creatorId, PreparedStatement statement) throws SQLException {
+        statement.setString(1, start);
+        statement.setString(2, finish);
+        statement.setString(3, time);
+        statement.setString(4, placesFree);
+        statement.setString(5, creatorId);
+        ResultSet res = statement.executeQuery();
+        res.next();
+        return res.getString(1);
     }
 }
