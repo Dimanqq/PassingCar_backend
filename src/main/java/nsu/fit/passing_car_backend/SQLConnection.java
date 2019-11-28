@@ -171,7 +171,7 @@ public class SQLConnection {
         int count, places;
         //check repeatable invite query
         try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT COUNT(*) FROM image WHERE " +
+                ("SELECT COUNT(*) FROM m2m_ride_user WHERE " +
                         "m2m_ride_user.user_id::text = ? AND m2m_ride_user.ride_id::text = ?")) {
             statement.setString(1, userId);
             statement.setString(2, rideId);
@@ -184,7 +184,7 @@ public class SQLConnection {
 
         //check count of users who already take part in this trip
         try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT COUNT (*) FROM image WHERE m2m_ride_user.ride_id::text = ?")) {
+                ("SELECT COUNT (*) FROM m2m_ride_user WHERE m2m_ride_user.ride_id::text = ?")) {
             statement.setString(1, rideId);
             ResultSet res = statement.executeQuery();
             res.next();
@@ -201,26 +201,16 @@ public class SQLConnection {
         }
 
         //if this user is first
-        if (count == 0) {
-            try (PreparedStatement statement = connection.prepareStatement
-                    ("INSERT INTO \"m2m_ride_user\" (user_id, ride_id) VALUES (?, ?)")) {
-                statement.setString(1, userId);
-                statement.setString(2, rideId);
-                statement.executeQuery();
-            }
+        try (PreparedStatement statement = connection.prepareStatement
+                ("INSERT INTO \"m2m_ride_user\" (user_id, ride_id) VALUES (?::uuid, ?::uuid)")) {
+            statement.setString(1, userId);
+            statement.setString(2, rideId);
+            statement.execute();
         }
 
         //count with new user
         count++;
 
-        int freeCount = places - count;
-
-        try (PreparedStatement statement = connection.prepareStatement
-                ("UPDATE \"ride\" SET ride.places_count = ? WHERE ride.id::text = ?")) {
-            statement.setInt(1, freeCount);
-            statement.setString(2, rideId);
-            statement.executeQuery();
-        }
-        return freeCount;
+        return places - count;
     }
 }

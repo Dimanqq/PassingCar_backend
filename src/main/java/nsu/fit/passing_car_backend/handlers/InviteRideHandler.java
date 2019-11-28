@@ -20,15 +20,8 @@ public class InviteRideHandler implements HttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        String userId = exchange.getQueryParameters().get("id").getFirst();
-
-        Reader reader = new BufferedReader(new InputStreamReader(
-                exchange.getInputStream(),
-                StandardCharsets.UTF_8
-        ));
-        JSONParser jsonParser = new JSONParser();
-        JSONObject o = (JSONObject) jsonParser.parse(reader);
-        String rideId = (String) o.get("ride_id");
+        String rideId = exchange.getQueryParameters().get("id").getFirst();
+        String userId = exchange.getRequestHeaders().get("Authorization").getFirst();
         int places = serverUtils.sqlConnection.joinRide(userId, rideId);
         if (places != -1){
             exchange.setStatusCode(201);
