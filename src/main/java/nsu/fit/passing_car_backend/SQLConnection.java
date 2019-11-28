@@ -136,16 +136,16 @@ public class SQLConnection {
         }
     }
 
-    public String createRide(String lonStart, String latStart, String lonFinish, String latFinish, String time, String placesFree, String creatorId) throws SQLException {
+    public String createRide(Double lonStart, Double latStart, Double lonFinish, Double latFinish, String time, Integer placesFree, String creatorId) throws SQLException {
         String startId = insertPoint(lonStart, latStart);
         String finishId = insertPoint(lonFinish, latFinish);
 
         try (PreparedStatement statement = connection.prepareStatement
-                (" INSERT INTO \"ride\" (point_start, point_end, time_start, places_count, creator_id) VALUES (?, ?, ?, ?, ?) RETURNING id")) {
+                (" INSERT INTO \"ride\" (point_start, point_end, time_start, places_count, creator_id) VALUES (?::uuid, ?::uuid, ?::timestamptz, ?, ?::uuid) RETURNING id")) {
             statement.setString(1, startId);
             statement.setString(2, finishId);
-            statement.setDate(3, Date.valueOf(time));
-            statement.setString(4, placesFree);
+            statement.setString(3, time);
+            statement.setInt(4, placesFree);
             statement.setString(5, creatorId);
             ResultSet res = statement.executeQuery();
             res.next();
@@ -153,12 +153,12 @@ public class SQLConnection {
         }
     }
 
-    private String insertPoint(String lonFinish, String latFinish) throws SQLException {
+    private String insertPoint(Double lonFinish, Double latFinish) throws SQLException {
         String id;
         try (PreparedStatement statement = connection.prepareStatement
                 ("INSERT INTO \"point\" (lat, lon) VALUES (?, ?) RETURNING id")) {
-            statement.setDouble(1, Double.valueOf(latFinish));
-            statement.setDouble(2, Double.valueOf(lonFinish));
+            statement.setDouble(1, latFinish);
+            statement.setDouble(2, lonFinish);
             ResultSet res = statement.executeQuery();
             res.next();
             id = res.getString(1);
