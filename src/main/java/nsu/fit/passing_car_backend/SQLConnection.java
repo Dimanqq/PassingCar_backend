@@ -123,7 +123,7 @@ public class SQLConnection {
         }
     }
 
-    public String registerUser(String email, String passw, String firstName, String lastName, String phone) throws SQLException, DataError {
+    public String registerUser(String firstName, String lastName, String passw, String phone, String email) throws SQLException, DataError {
         try (PreparedStatement statement = connection.prepareStatement
                 (" INSERT INTO \"user\" (" +
                         "email, \"password\", first_name, last_name, phone" +
@@ -137,10 +137,7 @@ public class SQLConnection {
             res.next();
             return res.getString(1);
         } catch (PSQLException e){
-            if(e.getServerErrorMessage().getConstraint().indexOf("user_") == 0){
-                throw new DataError(DataError.DUPLICATE, e.getServerErrorMessage().getConstraint().substring(5));
-            }
-            throw e;
+            throw new DataError(DataError.DUPLICATE, e.getServerErrorMessage().toString());
         }
     }
 
