@@ -33,6 +33,8 @@ public class Main {
                 ))
                 .post("/create/user", new BlockingHandler(new RegistrationHandler(serverUtils)
                 ))
+                .post("/signin", new BlockingHandler(new SigninHandler(serverUtils)
+                ))
                 .post("/rides/{id}/invite", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new InviteRideHandler(serverUtils))

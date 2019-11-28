@@ -2,6 +2,7 @@ package nsu.fit.passing_car_backend;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.postgresql.util.PSQLException;
 
 import java.io.InputStream;
 import java.sql.*;
@@ -122,9 +123,11 @@ public class SQLConnection {
         }
     }
 
-    public String registerUser(String email, String passw, String firstName, String lastName, String phone) throws SQLException {
+    public String registerUser(String email, String passw, String firstName, String lastName, String phone) throws SQLException, DataError {
         try (PreparedStatement statement = connection.prepareStatement
-                (" INSERT INTO \"user\" (email, \"password\", first_name, last_name, phone) VALUES (?, ?, ?, ?, ?) RETURNING id")) {
+                (" INSERT INTO \"user\" (" +
+                        "email, \"password\", first_name, last_name, phone" +
+                    ") VALUES (?, ?, ?, ?, ?) RETURNING id")) {
             statement.setString(1, email);
             statement.setString(2, passw);
             statement.setString(3, firstName);
@@ -133,6 +136,11 @@ public class SQLConnection {
             ResultSet res = statement.executeQuery();
             res.next();
             return res.getString(1);
+        } catch (PSQLException e){
+            if(e.getServerErrorMessage().getConstraint().indexOf("user_") == 0){
+                throw new DataError(DataError.DUPLICATE, e.getServerErrorMessage().getConstraint().substring(5));
+            }
+            throw e;
         }
     }
 
