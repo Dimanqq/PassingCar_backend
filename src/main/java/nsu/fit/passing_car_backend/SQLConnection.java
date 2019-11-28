@@ -42,6 +42,7 @@ public class SQLConnection {
                 "CONSTRAINT \"user_pk\" PRIMARY KEY (\"id\"),\n" +
                 "CONSTRAINT \"user_fk0\" FOREIGN KEY (\"avatar_id\") REFERENCES \"image\"(\"id\")\n" +
                 ")");
+        //runSQL();
     }
 
     public void addUser(String name, int cnt) throws SQLException {
@@ -137,8 +138,8 @@ public class SQLConnection {
     }
 
     public String createRide(String lonStart, String latStart, String lonFinish, String latFinish, String time, String placesFree, String creatorId) throws SQLException {
-        String startId = setLatLon(lonStart, latStart);
-        String finishId = setLatLon(lonFinish, latFinish);
+        String startId = insertPoint(lonStart, latStart);
+        String finishId = insertPoint(lonFinish, latFinish);
 
         try (PreparedStatement statement = connection.prepareStatement
                 (" INSERT INTO \"ride\" (point_start, point_end, time_start, places_count, creator_id) VALUES (?, ?, ?, ?, ?) RETURNING id")) {
@@ -153,7 +154,7 @@ public class SQLConnection {
         }
     }
 
-    private String setLatLon(String lonFinish, String latFinish) throws SQLException {
+    private String insertPoint(String lonFinish, String latFinish) throws SQLException {
         String id;
         try (PreparedStatement statement = connection.prepareStatement
                 (" INSERT INTO \"point\" (lat, lon) VALUES (?, ?) RETURNING id")) {

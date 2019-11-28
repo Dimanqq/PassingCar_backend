@@ -12,11 +12,11 @@ public class Main {
     public static void main(String[] args) {
         final ServerUtils serverUtils;
         SQLCreds creds = new SQLCreds();
-        creds.ip = "192.168.43.17";
+        creds.ip = "3.19.71.72";
         creds.port = 5433;
         creds.db = "passing_car";
         creds.user = "postgres";
-        creds.password = "1234";
+        creds.password = "qp~pq234";
         try {
             serverUtils = new ServerUtils();
             serverUtils.sqlConnection = new SQLConnection(creds);
