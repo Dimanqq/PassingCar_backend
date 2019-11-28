@@ -51,7 +51,7 @@ public class Main {
                 )//)
                 .get("/riders/{id}", new AuthorizationHandler(
                         serverUtils,
-                        new BlockingHandler(new GetRiderHandler(serverUtils))
+                        new BlockingHandler(new GetRideHandler(serverUtils))
                 ))
                 .get("/search", new AuthorizationHandler(
                         serverUtils,

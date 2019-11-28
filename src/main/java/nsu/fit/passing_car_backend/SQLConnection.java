@@ -42,7 +42,35 @@ public class SQLConnection {
                 "CONSTRAINT \"user_pk\" PRIMARY KEY (\"id\"),\n" +
                 "CONSTRAINT \"user_fk0\" FOREIGN KEY (\"avatar_id\") REFERENCES \"image\"(\"id\")\n" +
                 ")");
-        //runSQL();
+        runSQL("CREATE TABLE IF NOT EXISTS point (\n" +
+                "id uuid NOT NULL DEFAULT uuid_generate_v1(),\n" +
+                "lat float NOT NULL,\n" +
+                "lon float NOT NULL,\n" +
+                "CONSTRAINT point_pk PRIMARY KEY (id)\n" +
+                ")");
+        runSQL("CREATE TABLE IF NOT EXISTS ride (\n" +
+                "id uuid NOT NULL DEFAULT uuid_generate_v1(),\n" +
+                "point_start uuid NOT NULL,\n" +
+                "point_end uuid NOT NULL,\n" +
+                "time_start timestamptz NOT NULL,\n" +
+                "places_count integer NOT NULL,\n" +
+                "creator_id uuid NOT NULL,\n" +
+                "CONSTRAINT ride_pk PRIMARY KEY (id),\n" +
+                "CONSTRAINT ride_point_start FOREIGN KEY (point_start)\n" +
+                "REFERENCES point(id),\n" +
+                "CONSTRAINT ride_point_end FOREIGN KEY (point_end)\n" +
+                "REFERENCES point(id),\n" +
+                "CONSTRAINT ride_creator_id FOREIGN KEY (creator_id)\n" +
+                "REFERENCES \"user\"(id)\n" +
+                ")");
+        runSQL("CREATE TABLE IF NOT EXISTS m2m_ride_user (\n" +
+                "user_id uuid NOT NULL,\n" +
+                "ride_id uuid NOT NULL,\n" +
+                "CONSTRAINT m2m_ride_user_user_id FOREIGN KEY (user_id)\n" +
+                "REFERENCES \"user\"(id),\n" +
+                "CONSTRAINT m2m_ride_user_ride_id FOREIGN KEY (ride_id)\n" +
+                "REFERENCES ride(id)\n" +
+                ")");
     }
 
     public void addUser(String name, int cnt) throws SQLException {
@@ -168,4 +196,7 @@ public class SQLConnection {
     }
 
 
+    public boolean joinRide(String rideId) {
+        return false;
+    }
 }
