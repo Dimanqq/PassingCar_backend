@@ -218,4 +218,17 @@ public class SQLConnection {
 
         return places - count;
     }
+
+    public JSONObject getRide(String rideId) throws SQLException {
+        JSONObject ride;
+        try (PreparedStatement statement = connection.prepareStatement
+                ("SELECT (*) FROM \"ride\" WHERE ride.id = ?")) {
+            statement.setString(1, rideId);
+            ResultSet res = statement.executeQuery();   //  todo ride might be not found
+            ride = new JSONObject();
+            ride.put("lat_start", res.getString(1)); //todo select from point
+
+            return ride;
+        }
+    }
 }

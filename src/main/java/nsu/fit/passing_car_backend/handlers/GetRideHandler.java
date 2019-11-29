@@ -12,7 +12,9 @@ public class GetRideHandler implements HttpHandler {
     }
 
     @Override
-    public void handleRequest(HttpServerExchange httpServerExchange) throws Exception {
-
+    public void handleRequest(HttpServerExchange exchange) throws Exception {
+        String rideId = exchange.getQueryParameters().get("id").getFirst();
+        exchange.setStatusCode(200);
+        exchange.getResponseSender().send(serverUtils.sqlConnection.getRide(rideId).toString());
     }
 }
