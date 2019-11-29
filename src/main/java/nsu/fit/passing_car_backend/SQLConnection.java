@@ -1,6 +1,5 @@
 package nsu.fit.passing_car_backend;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.postgresql.util.PSQLException;
 
@@ -98,7 +97,7 @@ public class SQLConnection {
         try (PreparedStatement statement = connection.prepareStatement
                 (" INSERT INTO \"user\" (" +
                         "email, \"password\", first_name, last_name, phone" +
-                    ") VALUES (?, ?, ?, ?, ?) RETURNING id")) {
+                        ") VALUES (?, ?, ?, ?, ?) RETURNING id")) {
             statement.setString(1, email);
             statement.setString(2, passw);
             statement.setString(3, firstName);
@@ -107,7 +106,7 @@ public class SQLConnection {
             ResultSet res = statement.executeQuery();
             res.next();
             return res.getString(1);
-        } catch (PSQLException e){
+        } catch (PSQLException e) {
             throw new DataError(DataError.DUPLICATE, e.getServerErrorMessage().toString());
         }
     }
@@ -221,13 +220,33 @@ public class SQLConnection {
 
     public JSONObject getRide(String rideId) throws SQLException {
         JSONObject ride;
+        String startId, endId;
         try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT (*) FROM \"ride\" WHERE ride.id = ?")) {
+                ("SELECT (point_start, point_end, time_start, places_count, creator_id) FROM \"ride\" WHERE ride.id::text = ?")) {
             statement.setString(1, rideId);
             ResultSet res = statement.executeQuery();   //  todo ride might be not found
             ride = new JSONObject();
-            ride.put("lat_start", res.getString(1)); //todo select from point
+            startId = res.getString(1);
+            endId = res.getString(2);
+            ride.put("time_start", res.getString(3));
+            ride.put("places_count", res.getString(4));
+            ride.put("creator_id", res.getString(5));
 
+            try (PreparedStatement s1 = connection.prepareStatement
+                    ("SELECT (point.lat, point.lon) FROM \"point\" WHERE point.id::text = ?")) {
+                statement.setString(1, startId);
+                ResultSet resPoint = s1.executeQuery();
+                ride.put("lat_start", resPoint.getString(1));
+                ride.put("lon_start", resPoint.getString(2));
+            }
+
+            try (PreparedStatement s2 = connection.prepareStatement
+                    ("SELECT (point.lat, point.lon) FROM \"point\" WHERE point.id::text = ?")) {
+                statement.setString(1, endId);
+                ResultSet resPoint = s2.executeQuery();
+                ride.put("lat_end", resPoint.getString(1));
+                ride.put("lon_end", resPoint.getString(2));
+            }
             return ride;
         }
     }

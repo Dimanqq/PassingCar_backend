@@ -30,7 +30,7 @@ public class CreateRideHandler implements HttpHandler {
         Double lonStart = (Double) o.get("lon_start");
         Double latEnd = (Double) o.get("lat_end");
         Double lonEnd = (Double) o.get("lon_end");
-        String timeStart = (String) o.get("time_start"); // todo time format?
+        String timeStart = (String) o.get("time_start");
         Integer placesCount = ((Long)o.get("places_count")).intValue();
         String creatorId = exchange.getRequestHeaders().get("Authorization").getFirst();
         String rideId = serverUtils.sqlConnection.createRide(lonStart, latStart, lonEnd, latEnd, timeStart, placesCount, creatorId);

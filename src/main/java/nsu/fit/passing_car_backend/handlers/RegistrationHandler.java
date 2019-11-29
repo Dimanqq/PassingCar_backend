@@ -39,7 +39,7 @@ public class RegistrationHandler implements HttpHandler {
             exchange.setStatusCode(201);
             exchange.getResponseSender().send(idObject.toString());
         } catch(DataError e){
-            e.send(exchange);
+            e.send(exchange);// todo need response if data error
         }
     }
 }
