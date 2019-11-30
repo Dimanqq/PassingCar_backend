@@ -94,22 +94,6 @@ public class SQLConnection {
         }
     }
 
-    public JSONObject getUser(String userId) throws SQLException {
-        JSONObject user;
-        try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT \"user\".id FROM \"user\" WHERE user.id = ?")) {
-            statement.setString(1, userId);
-            ResultSet res = statement.executeQuery();   //  todo user might be not found
-            user = new JSONObject();
-            user.put("email", res.getString(1));
-            user.put("password", res.getString(2));
-            user.put("first_name", res.getString(3));
-            user.put("last_name", res.getString(4));
-            user.put("phone", res.getString(5));
-            return user;
-        }
-    }
-
     public int joinRide(String userId, String rideId) throws SQLException {
         int count, places;
         //check repeatable invite query
