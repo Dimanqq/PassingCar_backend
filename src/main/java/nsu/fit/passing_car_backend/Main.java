@@ -7,22 +7,13 @@ import io.undertow.server.handlers.BlockingHandler;
 import nsu.fit.passing_car_backend.handlers.*;
 
 import java.sql.SQLException;
-import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
         final ServerUtils serverUtils;
-        SQLCreds creds = new SQLCreds();
-        Map<String, String> env = System.getenv();
-        creds.port = Integer.valueOf(env.getOrDefault("POSTGRES_PORT", "5433"));
-        creds.ip = env.getOrDefault("POSTGRES_IP", "3.19.71.72");
-        creds.db = env.getOrDefault("POSTGRES_DATABASE", "passing_car");
-        creds.user = env.getOrDefault("POSTGRES_USER", "postgres");
-        creds.password = env.getOrDefault("POSTGRES_PASS", "qp~pq234");
-        System.out.println(creds.port + " " + creds.ip + " " + creds.db + " " + creds.user + " " + creds.password);
         try {
             serverUtils = new ServerUtils();
-            serverUtils.sqlConnection = new SQLConnection(creds);
+            serverUtils.sqlConnection = new SQLConnection(SQLCreds.loadFromEnv());
             serverUtils.sqlConnection.initDB();
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
@@ -50,10 +41,9 @@ public class Main {
                         serverUtils,
                         new BlockingHandler(new GetUserHandler(serverUtils))
                 ))
-                .get("/images/{id}", /*new AuthorizationHandler(*/
-                        //     serverUtils,
+                .get("/images/{id}",
                         new BlockingHandler(new GetImageHandler(serverUtils))
-                )//)
+                )
                 .get("/riders/{id}", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new GetRideHandler(serverUtils))
