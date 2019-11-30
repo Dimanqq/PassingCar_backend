@@ -1,6 +1,7 @@
 package nsu.fit.passing_car_backend;
 
 import org.json.simple.JSONObject;
+import org.postgresql.util.PSQLException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,7 +9,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 public abstract class SQLStatement {
-    private Connection connection;
+
     abstract protected AssertMap getAssert();
 
     abstract protected String getSQL();
@@ -38,10 +39,12 @@ public abstract class SQLStatement {
     }
 
     public Map go(Connection connection, Map data) throws DataError {
-        this.connection = connection;
         goAssert(data);
         try (PreparedStatement statement = connection.prepareStatement(getSQL())) {
             return run(statement, data);
+        }catch (PSQLException e){
+            System.out.println(e.getServerErrorMessage().getWhere());
+            throw new DataError(DataError.UNKNOWN_ERROR, "PSQLException");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DataError(DataError.UNKNOWN_ERROR, "SQLException");
@@ -59,13 +62,13 @@ public abstract class SQLStatement {
             return oneValue("value", result);
         }
 
-        private static void copy(java.util.Map a, java.util.Map b){
-            for(Object key: a.keySet()){
+        private static void copy(java.util.Map a, java.util.Map b) {
+            for (Object key : a.keySet()) {
                 b.put(key, a.get(key));
             }
         }
 
-        public static Map fromJSON(JSONObject data){
+        public static Map fromJSON(JSONObject data) {
             Map map = new Map();
             copy(data, map);
             return map;
@@ -75,7 +78,7 @@ public abstract class SQLStatement {
             return get("value");
         }
 
-        public JSONObject toJSON(){
+        public JSONObject toJSON() {
             JSONObject o = new JSONObject();
             copy(this, o);
             return o;

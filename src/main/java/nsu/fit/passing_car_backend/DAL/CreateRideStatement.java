@@ -12,7 +12,6 @@ public class CreateRideStatement extends SQLStatement {
         AssertMap map = new AssertMap();
         map.put("start_id", String.class);
         map.put("end_id", String.class);
-        map.put("lon_end", Double.class);
         map.put("time_start", String.class);
         map.put("places_count", Long.class);
         map.put("creator_id", String.class);
@@ -33,7 +32,7 @@ public class CreateRideStatement extends SQLStatement {
         statement.setString(1, (String) data.get("start_id"));
         statement.setString(2, (String) data.get("end_id"));
         statement.setString(3, (String) data.get("time_start"));
-        statement.setInt(4, (Integer) data.get("places_count"));
+        statement.setInt(4, ((Long) data.get("places_count")).intValue());
         statement.setString(5, (String) data.get("creator_id"));
         ResultSet res = statement.executeQuery();
         res.next();

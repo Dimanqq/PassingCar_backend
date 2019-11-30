@@ -17,21 +17,25 @@ public class InviteRideHandler implements HttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        SQLStatement.Map data = new SQLStatement.Map();
-        data.put("ride_id", exchange.getQueryParameters().get("id").getFirst());
-        data.put("user_id", exchange.getRequestHeaders().get("Authorization").getFirst());
-        SQLStatement.Map res = serverUtils.sqlConnection.runStatement(data, new InviteRideStatement());
-        if (((Boolean) res.get("already_invite"))) {
-            throw new DataError(DataError.ALREADY_INVITE, "");
+        try {
+            SQLStatement.Map data = new SQLStatement.Map();
+            data.put("ride_id", exchange.getQueryParameters().get("id").getFirst());
+            data.put("user_id", exchange.getRequestHeaders().get("Authorization").getFirst());
+            SQLStatement.Map res = serverUtils.sqlConnection.runStatement(data, new InviteRideStatement());
+            if (((Boolean) res.get("already_invite"))) {
+                throw new DataError(DataError.ALREADY_INVITE, "");
+            }
+            if (((Integer) res.get("free_places")) == 0) {
+                throw new DataError(DataError.NO_FREE_PLACES, "");
+            }
+            serverUtils.sqlConnection.runStatement(data, new InviteRideAddStatement());
+            exchange.setStatusCode(201);
+            exchange.getResponseSender().send(SQLStatement.Map.oneValue(
+                    "free_places",
+                    ((Integer) res.get("free_places")) - 1
+            ).toJSON().toString());
+        } catch (DataError e){
+            e.send(exchange);
         }
-        if (((Integer) res.get("free_places")) == 0) {
-            throw new DataError(DataError.NO_FREE_PLACES, "");
-        }
-        serverUtils.sqlConnection.runStatement(data, new InviteRideAddStatement());
-        exchange.setStatusCode(201);
-        exchange.getResponseSender().send(SQLStatement.Map.oneValue(
-                "free_places",
-                ((Integer) res.get("free_places")) - 1
-        ).toJSON().toString());
     }
 }

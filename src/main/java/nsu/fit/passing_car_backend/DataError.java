@@ -10,6 +10,7 @@ public class DataError extends Exception {
     public static int UNKNOWN_ERROR = 4;
     public static int ALREADY_INVITE = 5;
     public static int NO_FREE_PLACES = 6;
+    public static int UNAUTHORIZED = 7;
     public int code;
     public String desc;
 

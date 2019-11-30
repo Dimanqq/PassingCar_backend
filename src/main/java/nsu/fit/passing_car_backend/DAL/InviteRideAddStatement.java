@@ -18,7 +18,7 @@ public class InviteRideAddStatement extends SQLStatement {
 
     @Override
     protected Map run(PreparedStatement statement, Map data) throws SQLException {
-        statement.setString(1, (String) data.get("iser_id"));
+        statement.setString(1, (String) data.get("user_id"));
         statement.setString(2, (String) data.get("ride_id"));
         statement.execute();
         return null;

@@ -28,7 +28,7 @@ public class InviteRideStatement extends SQLStatement {
                 "\t\tSELECT COUNT(*) FROM m2m_ride_user\n" +
                 "\t\tWHERE m2m_ride_user.ride_id = glb.ride_id\n" +
                 "\t\tAND m2m_ride_user.user_id = glb.user_id\n" +
-                "\t) = 0 FROM (\n" +
+                "\t) > 0 FROM (\n" +
                 "\t\tSELECT\n" +
                 "\t\t\t?::uuid AS user_id,\n" +
                 "\t\t\t?::uuid AS ride_id\n" +
