@@ -1,6 +1,5 @@
 package nsu.fit.passing_car_backend;
 
-import org.json.simple.JSONObject;
 import org.postgresql.util.PSQLException;
 
 import java.sql.*;
@@ -94,50 +93,4 @@ public class SQLConnection {
         }
     }
 
-    public int joinRide(String userId, String rideId) throws SQLException {
-        int count, places;
-        //check repeatable invite query
-        try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT COUNT(*) FROM m2m_ride_user WHERE " +
-                        "m2m_ride_user.user_id::text = ? AND m2m_ride_user.ride_id::text = ?")) {
-            statement.setString(1, userId);
-            statement.setString(2, rideId);
-            ResultSet res = statement.executeQuery();
-            res.next();
-            count = Integer.parseInt(res.getString(1));
-            if (count > 0)
-                return -1;
-        }
-
-        //check count of users who already take part in this trip
-        try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT COUNT (*) FROM m2m_ride_user WHERE m2m_ride_user.ride_id::text = ?")) {
-            statement.setString(1, rideId);
-            ResultSet res = statement.executeQuery();
-            res.next();
-            count = Integer.parseInt(res.getString(1));
-        }
-
-        //get max count of users in this pass
-        try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT ride.places_count FROM ride WHERE ride.id::text = ?")) {
-            statement.setString(1, rideId);
-            ResultSet res = statement.executeQuery();
-            res.next();
-            places = Integer.parseInt(res.getString(1));
-        }
-
-        //if this user is first
-        try (PreparedStatement statement = connection.prepareStatement
-                ("INSERT INTO \"m2m_ride_user\" (user_id, ride_id) VALUES (?::uuid, ?::uuid)")) {
-            statement.setString(1, userId);
-            statement.setString(2, rideId);
-            statement.execute();
-        }
-
-        //count with new user
-        count++;
-
-        return places - count;
-    }
 }
