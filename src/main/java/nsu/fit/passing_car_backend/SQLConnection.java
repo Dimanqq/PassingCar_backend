@@ -110,19 +110,6 @@ public class SQLConnection {
         }
     }
 
-    public ImageData getImage(String imageId) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT image.mime_type, image.data FROM image WHERE image.id::text = ?")) {
-            statement.setString(1, imageId);
-            ResultSet res = statement.executeQuery();   //  todo image might be not found
-            res.next();
-            ImageData imageData = new ImageData();
-            imageData.mimeType = res.getString(1);
-            imageData.data = res.getBinaryStream(2);
-            return imageData;
-        }
-    }
-
     public int joinRide(String userId, String rideId) throws SQLException {
         int count, places;
         //check repeatable invite query
