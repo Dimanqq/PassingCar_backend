@@ -1,5 +1,6 @@
 #/bin/bash
 
+cd "${0%/*}"
 mvn package
 sudo docker build -t app_i --no-cache .
 sudo docker rm -f app_w
