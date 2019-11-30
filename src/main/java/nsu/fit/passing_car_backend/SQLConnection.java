@@ -1,8 +1,9 @@
 package nsu.fit.passing_car_backend;
 
-import org.postgresql.util.PSQLException;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class SQLConnection {
     private Connection connection;
@@ -74,23 +75,4 @@ public class SQLConnection {
     public SQLStatement.Map runStatement(SQLStatement.Map data, SQLStatement statement) throws DataError {
         return statement.go(connection, data);
     }
-
-    public String registerUser(String firstName, String lastName, String passw, String phone, String email) throws SQLException, DataError {
-        try (PreparedStatement statement = connection.prepareStatement
-                (" INSERT INTO \"user\" (" +
-                        "email, \"password\", first_name, last_name, phone" +
-                        ") VALUES (?, ?, ?, ?, ?) RETURNING id")) {
-            statement.setString(1, email);
-            statement.setString(2, passw);
-            statement.setString(3, firstName);
-            statement.setString(4, lastName);
-            statement.setString(5, phone);
-            ResultSet res = statement.executeQuery();
-            res.next();
-            return res.getString(1);
-        } catch (PSQLException e) {
-            throw new DataError(10, e.getServerErrorMessage().toString());
-        }
-    }
-
 }
