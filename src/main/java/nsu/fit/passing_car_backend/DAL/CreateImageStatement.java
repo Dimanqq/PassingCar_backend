@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 
 public class CreateImageStatement extends SQLStatement {
     @Override
@@ -28,6 +27,6 @@ public class CreateImageStatement extends SQLStatement {
         statement.setBinaryStream(2, (InputStream) data.get("stream"));
         ResultSet res = statement.executeQuery();
         res.next();
-        return Map.oneResult(res.getString(1));
+        return Map.oneValue("image_id", res.getString(1));
     }
 }

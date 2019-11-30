@@ -5,7 +5,6 @@ import io.undertow.server.HttpServerExchange;
 import nsu.fit.passing_car_backend.DAL.CreateImageStatement;
 import nsu.fit.passing_car_backend.SQLStatement;
 import nsu.fit.passing_car_backend.ServerUtils;
-import org.json.simple.JSONObject;
 
 public class CreateImageHandler implements HttpHandler {
     private ServerUtils serverUtils;
@@ -20,9 +19,7 @@ public class CreateImageHandler implements HttpHandler {
         map.put("mimeType", exchange.getRequestHeaders().get("Content-Type").getFirst());
         map.put("stream", exchange.getInputStream());
         map = serverUtils.sqlConnection.runStatement(map, new CreateImageStatement());
-        JSONObject o = new JSONObject();
-        o.put("image_id", map.get("result"));
         exchange.setStatusCode(201);
-        exchange.getResponseSender().send(o.toString());
+        exchange.getResponseSender().send(map.toJSON().toString());
     }
 }

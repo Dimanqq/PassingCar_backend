@@ -3,7 +3,6 @@ package nsu.fit.passing_car_backend;
 import org.json.simple.JSONObject;
 import org.postgresql.util.PSQLException;
 
-import java.io.InputStream;
 import java.sql.*;
 
 public class SQLConnection {
@@ -77,19 +76,11 @@ public class SQLConnection {
         return statement.go(connection, data);
     }
 
-    public boolean auth(String userId) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT \"user\".id FROM \"user\" WHERE \"user\".id::text = ?")) {
-            statement.setString(1, userId);
-            return statement.executeQuery().next();
-        }
-    }
-
     public String registerUser(String firstName, String lastName, String passw, String phone, String email) throws SQLException, DataError {
         try (PreparedStatement statement = connection.prepareStatement
                 (" INSERT INTO \"user\" (" +
                         "email, \"password\", first_name, last_name, phone" +
-                    ") VALUES (?, ?, ?, ?, ?) RETURNING id")) {
+                        ") VALUES (?, ?, ?, ?, ?) RETURNING id")) {
             statement.setString(1, email);
             statement.setString(2, passw);
             statement.setString(3, firstName);
@@ -98,7 +89,7 @@ public class SQLConnection {
             ResultSet res = statement.executeQuery();
             res.next();
             return res.getString(1);
-        } catch (PSQLException e){
+        } catch (PSQLException e) {
             throw new DataError(10, e.getServerErrorMessage().toString());
         }
     }
@@ -131,37 +122,6 @@ public class SQLConnection {
             return imageData;
         }
     }
-
-    public String createRide(Double lonStart, Double latStart, Double lonFinish, Double latFinish, String time, Integer placesFree, String creatorId) throws SQLException {
-        String startId = insertPoint(lonStart, latStart);
-        String finishId = insertPoint(lonFinish, latFinish);
-
-        try (PreparedStatement statement = connection.prepareStatement
-                (" INSERT INTO \"ride\" (point_start, point_end, time_start, places_count, creator_id) VALUES (?::uuid, ?::uuid, ?::timestamptz, ?, ?::uuid) RETURNING id")) {
-            statement.setString(1, startId);
-            statement.setString(2, finishId);
-            statement.setString(3, time);
-            statement.setInt(4, placesFree);
-            statement.setString(5, creatorId);
-            ResultSet res = statement.executeQuery();
-            res.next();
-            return res.getString(1);
-        }
-    }
-
-    private String insertPoint(Double lonFinish, Double latFinish) throws SQLException {
-        String id;
-        try (PreparedStatement statement = connection.prepareStatement
-                ("INSERT INTO \"point\" (lat, lon) VALUES (?, ?) RETURNING id")) {
-            statement.setDouble(1, latFinish);
-            statement.setDouble(2, lonFinish);
-            ResultSet res = statement.executeQuery();
-            res.next();
-            id = res.getString(1);
-        }
-        return id;
-    }
-
 
     public int joinRide(String userId, String rideId) throws SQLException {
         int count, places;

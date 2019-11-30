@@ -3,6 +3,8 @@ package nsu.fit.passing_car_backend.handlers;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderValues;
+import nsu.fit.passing_car_backend.DAL.UserValidateStatement;
+import nsu.fit.passing_car_backend.SQLStatement;
 import nsu.fit.passing_car_backend.ServerUtils;
 
 public class AuthorizationHandler implements HttpHandler {
@@ -17,13 +19,15 @@ public class AuthorizationHandler implements HttpHandler {
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         HeaderValues headerValues = exchange.getRequestHeaders().get("Authorization");
-            if (headerValues == null) {
+        if (headerValues == null) {
             exchange.setStatusCode(401);
             exchange.getResponseSender().send("No token");
             return;
         }
-        String token = headerValues.getFirst();
-        if (serverUtils.sqlConnection.auth(token)) {
+        if ((Boolean) serverUtils.sqlConnection.runStatement(
+                SQLStatement.Map.oneValue("userId", headerValues.getFirst()),
+                new UserValidateStatement()
+        ).value()) {
             httpHandler.handleRequest(exchange);
         } else {
             exchange.setStatusCode(403);
