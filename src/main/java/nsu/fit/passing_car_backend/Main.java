@@ -7,22 +7,19 @@ import io.undertow.server.handlers.BlockingHandler;
 import nsu.fit.passing_car_backend.handlers.*;
 
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
         final ServerUtils serverUtils;
         SQLCreds creds = new SQLCreds();
-	Map<String, String> env = System.getenv();
-	creds.port = Integer.valueOf(env.getOrDefault("POSTGRES_PORT", "5432"));
+        Map<String, String> env = System.getenv();
+        creds.port = Integer.valueOf(env.getOrDefault("POSTGRES_PORT", "5432"));
         creds.ip = env.getOrDefault("POSTGRES_IP", "3.19.71.72");
         creds.db = env.getOrDefault("POSTGRES_DATABASE", "passing_car");
         creds.user = env.getOrDefault("POSTGRES_USER", "postgres");
         creds.password = env.getOrDefault("POSTGRES_PASS", "qp~pq234");
-	System.out.println(creds.port + " " + creds.ip + " " + creds.db + " " + creds.user + " " + creds.password);
+        System.out.println(creds.port + " " + creds.ip + " " + creds.db + " " + creds.user + " " + creds.password);
         try {
             serverUtils = new ServerUtils();
             serverUtils.sqlConnection = new SQLConnection(creds);
