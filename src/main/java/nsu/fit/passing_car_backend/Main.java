@@ -7,22 +7,13 @@ import io.undertow.server.handlers.BlockingHandler;
 import nsu.fit.passing_car_backend.handlers.*;
 
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class Main {
     public static void main(String[] args) {
         final ServerUtils serverUtils;
-        SQLCreds creds = new SQLCreds();
-        creds.ip = "3.19.71.72";
-        creds.port = 5433;
-        creds.db = "passing_car";
-        creds.user = "postgres";
-        creds.password = "qp~pq234";
         try {
             serverUtils = new ServerUtils();
-            serverUtils.sqlConnection = new SQLConnection(creds);
+            serverUtils.sqlConnection = new SQLConnection(SQLCreds.loadFromEnv());
             serverUtils.sqlConnection.initDB();
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
@@ -50,10 +41,9 @@ public class Main {
                         serverUtils,
                         new BlockingHandler(new GetUserHandler(serverUtils))
                 ))
-                .get("/images/{id}", /*new AuthorizationHandler(*/
-                        //     serverUtils,
+                .get("/images/{id}",
                         new BlockingHandler(new GetImageHandler(serverUtils))
-                )//)
+                )
                 .get("/riders/{id}", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new GetRideHandler(serverUtils))
