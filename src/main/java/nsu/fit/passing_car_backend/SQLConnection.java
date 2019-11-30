@@ -1,6 +1,5 @@
 package nsu.fit.passing_car_backend;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.postgresql.util.PSQLException;
 
@@ -74,23 +73,15 @@ public class SQLConnection {
                 ")");
     }
 
+    public SQLStatement.Map runStatement(SQLStatement.Map data, SQLStatement statement) throws DataError {
+        return statement.go(connection, data);
+    }
 
     public boolean auth(String userId) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement
                 ("SELECT \"user\".id FROM \"user\" WHERE \"user\".id::text = ?")) {
             statement.setString(1, userId);
             return statement.executeQuery().next();
-        }
-    }
-
-    public String createImage(InputStream is, String mimeType) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement
-                (" INSERT INTO image (mime_type, data) VALUES (?, ?) RETURNING id")) {
-            statement.setString(1, mimeType);
-            statement.setBinaryStream(2, is);
-            ResultSet res = statement.executeQuery();
-            res.next();
-            return res.getString(1);
         }
     }
 
@@ -108,7 +99,7 @@ public class SQLConnection {
             res.next();
             return res.getString(1);
         } catch (PSQLException e){
-            throw new DataError(DataError.DUPLICATE, e.getServerErrorMessage().toString());
+            throw new DataError(10, e.getServerErrorMessage().toString());
         }
     }
 

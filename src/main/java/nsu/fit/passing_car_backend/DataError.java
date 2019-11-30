@@ -4,7 +4,10 @@ import io.undertow.server.HttpServerExchange;
 import org.json.simple.JSONObject;
 
 public class DataError extends Exception {
-    public static int DUPLICATE = 1;
+    public static int UNKNOWN_FIELD = 1;
+    public static int WRONG_TYPE_FIELD = 2;
+    public static int MISSED_FIELD = 3;
+    public static int UNKNOWN_ERROR = 4;
     public int code;
     public String desc;
     public DataError(int code, String desc){
