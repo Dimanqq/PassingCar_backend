@@ -42,7 +42,7 @@ public abstract class SQLStatement {
         goAssert(data);
         try (PreparedStatement statement = connection.prepareStatement(getSQL())) {
             return run(statement, data);
-        }catch (PSQLException e){
+        } catch (PSQLException e) {
             System.out.println(e.getServerErrorMessage().getWhere());
             throw new DataError(DataError.UNKNOWN_ERROR, "PSQLException");
         } catch (SQLException e) {
