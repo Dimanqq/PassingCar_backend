@@ -9,8 +9,5 @@
         <module name="PassingCar_backend" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="PassingCar_backend" target="9" />
-    </bytecodeTargetLevel>
   </component>
 </project>
