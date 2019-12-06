@@ -2,6 +2,9 @@ package nsu.fit.passing_car_backend.handlers;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import nsu.fit.passing_car_backend.DAL.AddPointStatement;
+import nsu.fit.passing_car_backend.DAL.CreateRideStatement;
+import nsu.fit.passing_car_backend.SQLStatement;
 import nsu.fit.passing_car_backend.ServerUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -24,19 +27,22 @@ public class CreateRideHandler implements HttpHandler {
                 exchange.getInputStream(),
                 StandardCharsets.UTF_8
         ));
-        JSONParser jsonParser = new JSONParser();
-        JSONObject o = (JSONObject) jsonParser.parse(reader);
-        Double latStart = (Double) o.get("lat_start");
-        Double lonStart = (Double) o.get("lon_start");
-        Double latEnd = (Double) o.get("lat_end");
-        Double lonEnd = (Double) o.get("lon_end");
-        String timeStart = (String) o.get("time_start"); // todo time format?
-        Integer placesCount = ((Long)o.get("places_count")).intValue();
-        String creatorId = exchange.getRequestHeaders().get("Authorization").getFirst();
-        String rideId = serverUtils.sqlConnection.createRide(lonStart, latStart, lonEnd, latEnd, timeStart, placesCount, creatorId);
-        JSONObject idObject = new JSONObject();
-        idObject.put("ride_id", rideId);
+        SQLStatement.Map data = SQLStatement.Map.fromJSON((JSONObject) new JSONParser().parse(reader));
+        SQLStatement.Map coor = new SQLStatement.Map();
+        coor.put("lat", data.remove("lat_start"));
+        coor.put("lon", data.remove("lon_start"));
+        data.put("start_id",
+                serverUtils.sqlConnection.runStatement(coor, new AddPointStatement()).value()
+        );
+        coor.put("lat", data.remove("lat_end"));
+        coor.put("lon", data.remove("lon_end"));
+        data.put("end_id",
+                serverUtils.sqlConnection.runStatement(coor, new AddPointStatement()).value()
+        );
+        data.put("creator_id", exchange.getRequestHeaders().get("Authorization").getFirst());
+        System.out.println(data.toJSON().toString());
+        data = serverUtils.sqlConnection.runStatement(data, new CreateRideStatement());
         exchange.setStatusCode(201);
-        exchange.getResponseSender().send(idObject.toString());
+        exchange.getResponseSender().send(data.toJSON().toString());
     }
 }
