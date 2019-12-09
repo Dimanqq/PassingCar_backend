@@ -24,8 +24,9 @@ public class AddPointStatement extends SQLStatement {
     protected Map run(PreparedStatement statement, Map data) throws SQLException {
         statement.setDouble(1, (Double) data.get("lat"));
         statement.setDouble(2, (Double) data.get("lon"));
-        ResultSet res = statement.executeQuery();
-        res.next();
-        return Map.oneValue(res.getString(1));
+        try (ResultSet res = statement.executeQuery()) {
+            res.next();
+            return Map.oneValue(res.getString(1));
+        }
     }
 }

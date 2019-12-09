@@ -32,8 +32,9 @@ public class CreateUserStatement extends SQLStatement {
         statement.setString(3, (String) data.get("first_name"));
         statement.setString(4, (String) data.get("last_name"));
         statement.setString(5, (String) data.get("phone"));
-        ResultSet res = statement.executeQuery();
-        res.next();
-        return Map.oneValue("user_id", res.getString(1));
+        try (ResultSet res = statement.executeQuery()) {
+            res.next();
+            return Map.oneValue("user_id", res.getString(1));
+        }
     }
 }

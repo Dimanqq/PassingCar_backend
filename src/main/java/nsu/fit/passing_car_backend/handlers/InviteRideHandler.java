@@ -16,7 +16,7 @@ public class InviteRideHandler implements HttpHandler {
     }
 
     @Override
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
+    public void handleRequest(HttpServerExchange exchange) {
         try {
             SQLStatement.Map data = new SQLStatement.Map();
             data.put("ride_id", exchange.getQueryParameters().get("id").getFirst());
@@ -34,7 +34,7 @@ public class InviteRideHandler implements HttpHandler {
                     "free_places",
                     ((Integer) res.get("free_places")) - 1
             ).toJSON().toString());
-        } catch (DataError e){
+        } catch (DataError e) {
             e.send(exchange);
         }
     }

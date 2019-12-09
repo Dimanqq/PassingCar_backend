@@ -12,7 +12,7 @@ public class SearchHandler implements HttpHandler {
     }
 
     @Override
-    public void handleRequest(HttpServerExchange httpServerExchange) throws Exception {
-
+    public void handleRequest(HttpServerExchange httpServerExchange) {
+        // TODO write
     }
 }

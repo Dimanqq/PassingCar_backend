@@ -39,11 +39,13 @@ public class InviteRideStatement extends SQLStatement {
     protected Map run(PreparedStatement statement, Map data) throws SQLException {
         statement.setString(1, (String) data.get("user_id"));
         statement.setString(2, (String) data.get("ride_id"));
-        ResultSet res = statement.executeQuery();
-        res.next();
-        Map info = new Map();
-        info.put("free_places", res.getInt(1));
-        info.put("already_invite", res.getBoolean(2));
+        Map info;
+        try (ResultSet res = statement.executeQuery()) {
+            res.next();
+            info = new Map();
+            info.put("free_places", res.getInt(1));
+            info.put("already_invite", res.getBoolean(2));
+        }
         return info;
     }
 }

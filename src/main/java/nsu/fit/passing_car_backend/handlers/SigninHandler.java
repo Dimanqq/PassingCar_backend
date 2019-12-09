@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
-public class SigninHandler implements HttpHandler{
+public class SigninHandler implements HttpHandler {
     private ServerUtils serverUtils;
 
     public SigninHandler(ServerUtils serverUtils) {
@@ -28,6 +28,6 @@ public class SigninHandler implements HttpHandler{
         JSONObject o = (JSONObject) jsonParser.parse(reader);
         String passw = (String) o.get("password");
         String phone = (String) o.get("phone");
-
+        // TODO write
     }
 }
