@@ -47,7 +47,20 @@ var reqs = {
 					var res3 = JSON.parse(req.responseText);
 					lg.log(res3);
 					lg.assert(req.status == 400);
-					lg.yes(res.user_id);
+					req = new XMLHttpRequest();
+					req.open("POST", "/signin", true);
+					req.send(JSON.stringify({
+						email: user.email,
+						password: user.password
+					}));
+					req.onerror = lg.no;
+					req.onload = function(){
+						var res4 = JSON.parse(req.responseText);
+						lg.log(res4);
+						lg.assert(req.status === 200);
+						lg.assert(res4.user_id === res.user_id);
+						lg.yes(res.user_id);
+					}
 				}
 			}
 		}

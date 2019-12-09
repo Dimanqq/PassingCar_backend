@@ -1,8 +1,6 @@
 package nsu.fit.passing_car_backend.DAL;
 
-import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.SQLStatement;
-import org.json.simple.JSONArray;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +10,7 @@ import java.util.List;
 
 public class SearchStatement extends SQLStatement {
     private static final double RADIUS = 10; // meters
+
     @Override
     protected AssertMap getAssert() {
         AssertMap map = new AssertMap();
@@ -32,13 +31,13 @@ public class SearchStatement extends SQLStatement {
     }
 
     @Override
-    protected Map run(PreparedStatement statement, Map data) throws SQLException, DataError {
+    protected Map run(PreparedStatement statement, Map data) throws SQLException {
         statement.setDouble(1, (Double) data.get("lat"));
         statement.setDouble(2, (Double) data.get("lon"));
         statement.setDouble(3, RADIUS);
         try (ResultSet res = statement.executeQuery()) {
             List<Map> lst = new ArrayList<>();
-            while(res.next()){
+            while (res.next()) {
                 Map e = new Map();
                 e.put("ride_id", res.getString(1));
                 e.put("lat_start", res.getDouble(2));
