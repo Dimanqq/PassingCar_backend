@@ -14,7 +14,7 @@ public abstract class SQLStatement {
 
     abstract protected String getSQL();
 
-    abstract protected Map run(PreparedStatement statement, Map data) throws SQLException;
+    abstract protected Map run(PreparedStatement statement, Map data) throws SQLException, DataError;
 
     private void goAssert(Map data) throws DataError {
         AssertMap types = getAssert();
