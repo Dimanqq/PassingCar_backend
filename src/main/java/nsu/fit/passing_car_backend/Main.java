@@ -44,7 +44,7 @@ public class Main {
                 .get("/images/{id}",
                         new BlockingHandler(new GetImageHandler(serverUtils))
                 )
-                .get("/riders/{id}", new AuthorizationHandler(
+                .get("/rides/{id}", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new GetRideHandler(serverUtils))
                 ))
@@ -55,7 +55,8 @@ public class Main {
                 .delete("/rides/{id}/invite", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new DeleteInviteHandler(serverUtils))
-                ));
+                ))
+                .get("/res", new BlockingHandler(new ResourcesHandler()));
 
         Undertow server = Undertow.builder().addHttpListener(8080,
                 "0.0.0.0").setHandler(mainHandler).build();

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tests</title>
+<script>
+function gen(pref){
+	return pref + "_" + Math.random();
+}
+var reqs = {
+	createUser: function(lg){
+		var user = {
+			first_name: gen("first_name"),
+			last_name: gen("last_name"),
+			password: gen("password"),
+			phone: gen("phone"),
+			email: gen("email")
+		};
+		var req = new XMLHttpRequest();
+		req.open("POST", "/create/user", true);
+		lg.log(user);
+		req.send(JSON.stringify(user));
+		req.onerror = lg.no;
+		req.onload = function(){
+			var res = JSON.parse(req.responseText);
+			lg.log(res);
+			lg.assert(req.status == 201);
+			lg.assert(res.user_id !== undefined);
+			req = new XMLHttpRequest();
+			req.open("GET", "/users/" + res.user_id, true);
+			req.setRequestHeader("Authorization", res.user_id);
+			req.send();
+			req.onerror = lg.no;
+			req.onload = function(){
+				var res2 = JSON.parse(req.responseText);
+				lg.log(res2);
+				lg.assert(req.status == 200);
+				lg.assert(res2.email === user.email);
+				lg.assert(res2.first_name === user.first_name);
+				lg.assert(res2.last_name === user.last_name);
+				lg.assert(res2.phone === user.phone);
+				req = new XMLHttpRequest();
+				req.open("POST", "/create/user", true);
+				req.send(JSON.stringify(user));
+				req.onerror = lg.no;
+				req.onload = function(){
+					var res3 = JSON.parse(req.responseText);
+					lg.log(res3);
+					lg.assert(req.status == 400);
+					req = new XMLHttpRequest();
+					req.open("POST", "/signin", true);
+					req.send(JSON.stringify({
+						email: user.email,
+						password: user.password
+					}));
+					req.onerror = lg.no;
+					req.onload = function(){
+						var res4 = JSON.parse(req.responseText);
+						lg.log(res4);
+						lg.assert(req.status === 200);
+						lg.assert(res4.user_id === res.user_id);
+						lg.yes(res.user_id);
+					}
+				}
+			}
+		}
+	},
+	createRide: function(lg, uid){
+		var ride = {
+			lat_start: Math.random(),
+			lon_start: Math.random(),
+			lat_end: Math.random(),
+			lon_end: Math.random(),
+			time_start: new Date().toISOString(),
+			places_count: 3
+		};
+		var req = new XMLHttpRequest();
+		req.open("POST", "/create/ride", true);
+		req.setRequestHeader("Authorization", uid);
+		lg.log(ride);
+		req.send(JSON.stringify(ride));
+		req.onerror = lg.no;
+		req.onload = function(){
+			var res = JSON.parse(req.responseText);
+			lg.log(res);
+			lg.assert(req.status == 201);
+			lg.assert(res.ride_id !== undefined);
+			req = new XMLHttpRequest();
+			req.open("GET", "/rides/" + res.ride_id);
+			req.setRequestHeader("Authorization", uid);
+			req.send();
+			req.onerror = lg.no;
+			req.onload = function(){
+				var res2 = JSON.parse(req.responseText);
+				lg.log(res2.time_start);
+				res2.time_start = new Date(res2.time_start).toISOString();
+				lg.log(res2);
+				lg.assert(req.status == 200);
+				lg.assert(ride.lat_start === res2.lat_start);
+				lg.assert(ride.lon_start === res2.lon_start);
+				lg.assert(ride.lat_end === res2.lat_end);
+				lg.assert(ride.lon_end === res2.lon_end);
+				lg.assert(ride.time_start === res2.time_start);
+				lg.assert(ride.places_count === res2.places_count);
+				lg.assert(uid === res2.creator_id);
+				req = new XMLHttpRequest();
+				req.open("POST", "/rides/" + res.ride_id + "/invite", true);
+				req.setRequestHeader("Authorization", uid);
+				req.send();
+				req.onerror = lg.no;
+				req.onload = function(){
+					var res3 = JSON.parse(req.responseText);
+					lg.log(res3);
+					lg.assert(res3.free_places === res2.places_count - 1);
+					lg.assert(req.status === 201);
+					req = new XMLHttpRequest();
+					req.open("POST", "/rides/" + res.ride_id + "/invite", true);
+					req.setRequestHeader("Authorization", uid);
+					req.send();
+					req.onerror = lg.no;
+					req.onload = function(){
+						var res4 = JSON.parse(req.responseText);
+						lg.log(res4);
+						lg.assert(req.status === 400);
+						lg.assert(res4.error_code === 5);
+						req = new XMLHttpRequest();
+						req.open("DELETE", "/rides/" + res.ride_id + "/invite", true);
+						req.setRequestHeader("Authorization", uid);
+						req.send();
+						req.onerror = lg.no;
+						req.onload = function(){
+							var res5 = JSON.parse(req.responseText);
+							lg.log(res5);
+							lg.assert(req.status === 202);
+							lg.assert(res5.status === true);
+							req = new XMLHttpRequest();
+							req.open("DELETE", "/rides/" + res.ride_id + "/invite", true);
+							req.setRequestHeader("Authorization", uid);
+							req.send();
+							req.onerror = lg.no;
+							req.onload = function(){
+								var res6 = JSON.parse(req.responseText);
+								lg.log(res6);
+								lg.assert(req.status === 400);
+								lg.assert(res6.error_code === 8);
+								lg.yes(uid);
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	searchRide: function(lg, uid){
+		function genRide(lat, lon){
+			return {
+				lat_start: lat,
+				lon_start: lon,
+				lat_end: Math.random(),
+				lon_end: Math.random(),
+				time_start: new Date().toISOString(),
+				places_count: 3
+			}
+		}
+		function createRide(ride, cb){
+			var req = new XMLHttpRequest();
+			req.open("POST", "/create/ride", true);
+			req.setRequestHeader("Authorization", uid);
+			lg.log(ride);
+			req.send(JSON.stringify(ride));
+			req.onerror = lg.no;
+			req.onload = function(){
+				var res = JSON.parse(req.responseText);
+				lg.log(res);
+				lg.assert(res.ride_id !== undefined);
+				lg.assert(req.status === 201);
+				ride.id = res.ride_id;
+				cb(ride);
+			}
+		}
+		createRide(genRide(10.1, 11.1), function(ride1){
+			createRide(genRide(12.1, 13.1), function(ride2){
+				var req = new XMLHttpRequest();
+				req.open("GET", "/search?lat=" + ride1.lat_start + "&lon=" + ride1.lon_start, true);
+				req.setRequestHeader("Authorization", uid);
+				req.send();
+				req.onerror = lg.no;
+				req.onload = function(){
+					var res = JSON.parse(req.responseText);
+					lg.log(res);
+					lg.assert(req.status === 200);
+					lg.assert(res.rides !== undefined);
+					var res1 = res.rides.find(e => e.ride_id == ride1.id);
+					var res2 = res.rides.find(e => e.ride_id == ride2.id);
+					lg.assert(res1 !== undefined);
+					lg.assert(res2 === undefined);
+					lg.assert(res1.lat_start === ride1.lat_start);
+					lg.assert(res1.lon_start === ride1.lon_start);
+					lg.yes(uid);
+				}
+			});
+		});
+	},
+	createImage: function(lg, uid){
+		var inp = document.createElement("input");
+		inp.type = "file";
+		inp.click();
+		lg.repr();
+		inp.onchange = function(){
+			lg.noRepr();
+			var r = new XMLHttpRequest();
+			r.open("POST", "/create/image", true);
+			r.setRequestHeader("Content-Type", inp.files[0].type);
+			r.setRequestHeader("Authorization", uid);
+			r.send(inp.files[0]);
+			r.onerror = lg.no;
+			r.onload = function(){
+				var res = JSON.parse(r.responseText);
+				lg.log(res);
+				lg.assert(r.status === 201);
+				lg.assert(res.image_id !== undefined);
+				window.open("/images/" + res.image_id);
+				lg.yes(uid);
+			}
+		}
+	}
+};
+// -------------------------------------------------------------------------------------
+function addTest(title, f){
+	var div = document.createElement("div");
+	var but = document.createElement("button");
+	but.innerText = title;
+	div.appendChild(but);
+	var status = document.createElement("span");
+	div.appendChild(status);
+	function ups(w){
+		status.innerText = w;
+	}
+	
+	var lg = {
+		log: function(w){
+			console.log(w);
+		},
+		no: function(){
+			ups("Wrong!");
+			console.trace();
+		},
+		yes: function(w){
+			ups("Sucs!");
+			if(glb.after !== undefined){
+				glb.after.go(w);
+			}
+		},
+		assert: function(cond){
+			if(!cond){
+				lg.log("Wrong assert");
+				lg.no();
+				throw "Wrong assert";
+			}
+		},
+		repr: function(){
+			ups("<< Press button if you see this hint so long");
+		},
+		noRepr: function(){
+			ups("Running...");
+		}
+	};
+	var glb = {
+		go: function(w){
+			if(w === undefined){
+				w = glb.last;
+			} else {
+				glb.last = w;
+			}
+			ups("Running...");
+			f(lg, w);
+		},
+		setAfter: function(t){
+			glb.after = t;
+			return t;
+		}
+	};
+	but.onclick = function(){
+		glb.go();
+	}
+	tests.appendChild(div);
+	return glb;
+}
+window.onload = function(){
+	addTest("Create user", reqs.createUser)
+	.setAfter(addTest("Create ride", reqs.createRide))
+	.setAfter(addTest("Search ride", reqs.searchRide))
+	.setAfter(addTest("Create image", reqs.createImage));
+}
+</script>
+</head>
+<body>
+	<h3>Tests</h3>
+	<div id="tests"></div>
+</body>
+</html>

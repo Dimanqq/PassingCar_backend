@@ -2,14 +2,10 @@ package nsu.fit.passing_car_backend.handlers;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import nsu.fit.passing_car_backend.DAL.SigninStatement;
+import nsu.fit.passing_car_backend.DataError;
+import nsu.fit.passing_car_backend.SQLStatement;
 import nsu.fit.passing_car_backend.ServerUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 
 public class SigninHandler implements HttpHandler {
     private ServerUtils serverUtils;
@@ -19,15 +15,13 @@ public class SigninHandler implements HttpHandler {
     }
 
     @Override
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
-        Reader reader = new BufferedReader(new InputStreamReader(
-                exchange.getInputStream(),
-                StandardCharsets.UTF_8
-        ));
-        JSONParser jsonParser = new JSONParser();
-        JSONObject o = (JSONObject) jsonParser.parse(reader);
-        String passw = (String) o.get("password");
-        String phone = (String) o.get("phone");
-        // TODO write
+    public void handleRequest(HttpServerExchange exchange) {
+        try {
+            SQLStatement.Map data = SQLStatement.Map.fromExchangeJSON(exchange);
+            data = serverUtils.sqlConnection.runStatement(data, new SigninStatement());
+            exchange.getResponseSender().send(data.toJSON().toString());
+        } catch (DataError e) {
+            e.send(exchange);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package nsu.fit.passing_car_backend.DAL;
 
+import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.SQLStatement;
 
 import java.sql.PreparedStatement;
@@ -36,12 +37,14 @@ public class InviteRideStatement extends SQLStatement {
     }
 
     @Override
-    protected Map run(PreparedStatement statement, Map data) throws SQLException {
+    protected Map run(PreparedStatement statement, Map data) throws SQLException, DataError {
         statement.setString(1, (String) data.get("user_id"));
         statement.setString(2, (String) data.get("ride_id"));
         Map info;
         try (ResultSet res = statement.executeQuery()) {
-            res.next();
+            if (!res.next()) {
+                throw new DataError(DataError.NOT_FOUND, "Ride not found");
+            }
             info = new Map();
             info.put("free_places", res.getInt(1));
             info.put("already_invite", res.getBoolean(2));

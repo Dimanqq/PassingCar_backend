@@ -51,7 +51,14 @@ public abstract class SQLStatement {
         try (PreparedStatement statement = connection.prepareStatement(getSQL())) {
             return run(statement, data);
         } catch (PSQLException e) {
-            System.out.println(e.getServerErrorMessage().getWhere());
+            if (e.getServerErrorMessage() != null) {
+                String constraint = e.getServerErrorMessage().getConstraint();
+                if (constraint != null) {
+                    throw new DataError(DataError.DUPLICATE, constraint);
+                }
+            }
+            e.printStackTrace();
+            System.err.println(getSQL());
             throw new DataError(DataError.UNKNOWN_ERROR, "PSQLException");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -101,6 +108,27 @@ public abstract class SQLStatement {
                     e.printStackTrace();
                 }
             }
+        }
+
+        public static Map fromExchangeQuery(HttpServerExchange exchange) {
+            Map data = new Map();
+            for (String key : exchange.getQueryParameters().keySet()) {
+                String d = exchange.getQueryParameters().get(key).getFirst();
+                try {
+                    data.put(key, Double.valueOf(d));
+                    continue;
+                } catch (NumberFormatException ignored) {
+
+                }
+                try {
+                    data.put(key, Integer.valueOf(d));
+                    continue;
+                } catch (NumberFormatException ignored) {
+
+                }
+                data.put(key, d);
+            }
+            return data;
         }
 
         public Object value() {
