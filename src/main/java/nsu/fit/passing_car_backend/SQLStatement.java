@@ -51,11 +51,14 @@ public abstract class SQLStatement {
         try (PreparedStatement statement = connection.prepareStatement(getSQL())) {
             return run(statement, data);
         } catch (PSQLException e) {
-            String constraint = e.getServerErrorMessage().getConstraint();
-            if(constraint != null){
-                throw new DataError(DataError.DUPLICATE, constraint);
+            if(e.getServerErrorMessage() != null) {
+                String constraint = e.getServerErrorMessage().getConstraint();
+                if (constraint != null) {
+                    throw new DataError(DataError.DUPLICATE, constraint);
+                }
             }
             e.printStackTrace();
+            System.err.println(getSQL());
             throw new DataError(DataError.UNKNOWN_ERROR, "PSQLException");
         } catch (SQLException e) {
             e.printStackTrace();

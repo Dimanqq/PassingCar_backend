@@ -31,7 +31,6 @@ public class CreateRideHandler implements HttpHandler {
                     serverUtils.sqlConnection.runStatement(coor, new AddPointStatement()).value()
             );
             data.put("creator_id", exchange.getRequestHeaders().get("Authorization").getFirst());
-            System.out.println(data.toJSON().toString());
             data = serverUtils.sqlConnection.runStatement(data, new CreateRideStatement());
             exchange.setStatusCode(201);
             exchange.getResponseSender().send(data.toJSON().toString());

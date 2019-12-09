@@ -44,7 +44,7 @@ public class Main {
                 .get("/images/{id}",
                         new BlockingHandler(new GetImageHandler(serverUtils))
                 )
-                .get("/riders/{id}", new AuthorizationHandler(
+                .get("/rides/{id}", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new GetRideHandler(serverUtils))
                 ))
