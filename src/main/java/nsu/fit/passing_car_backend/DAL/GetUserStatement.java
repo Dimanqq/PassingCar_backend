@@ -17,13 +17,12 @@ public class GetUserStatement extends SQLStatement {
 
     @Override
     protected String getSQL() {
-        return "SELECT" +
-                "\"user\".email," +
-                "\"user\".password," +
-                "\"user\".first_name," +
-                "\"user\".last_name," +
-                "\"user\".phone" +
-                "FROM \"user\" WHERE \"user\".id = ?";
+        return "SELECT " +
+                "\"user\".email, " +
+                "\"user\".first_name, " +
+                "\"user\".last_name, " +
+                "\"user\".phone " +
+                "FROM \"user\" WHERE \"user\".id = ?::uuid";
     }
 
     @Override
@@ -36,10 +35,9 @@ public class GetUserStatement extends SQLStatement {
             }
             user = new Map();
             user.put("email", res.getString(1));
-            user.put("password", res.getString(2));
-            user.put("first_name", res.getString(3));
-            user.put("last_name", res.getString(4));
-            user.put("phone", res.getString(5));
+            user.put("first_name", res.getString(2));
+            user.put("last_name", res.getString(3));
+            user.put("phone", res.getString(4));
         }
         return user;
     }

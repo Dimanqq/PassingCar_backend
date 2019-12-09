@@ -15,7 +15,7 @@ public class ResourcesHandler implements HttpHandler{
             Thread
                     .currentThread()
                     .getContextClassLoader()
-                    .getResourceAsStream("index.html")
+                    .getResourceAsStream("index.htm")
                     .transferTo(exchange.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();

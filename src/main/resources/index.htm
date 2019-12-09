@@ -1,10 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Tests</title>
+<meta charset="UTF-8">
+<title>Tests</title>
+<script>
+function gen(pref){
+	return pref + "_" + Math.random();
+}
+var reqs = {
+	createUser: function(lg){
+		var user = {
+			first_name: gen("first_name"),
+			last_name: gen("last_name"),
+			password: gen("password"),
+			phone: gen("phone"),
+			email: gen("email")
+		};
+		var req = new XMLHttpRequest();
+		req.open("POST", "/create/user", true);
+		lg.log(user);
+		req.send(JSON.stringify(user));
+		req.onerror = lg.no;
+		req.onload = function(){
+			var res = JSON.parse(req.responseText);
+			lg.log(res);
+			lg.assert(req.status == 201);
+			lg.assert(res.user_id !== undefined);
+			req = new XMLHttpRequest();
+			req.open("GET", "/users/" + res.user_id, true);
+			req.setRequestHeader("Authorization", res.user_id);
+			req.send();
+			req.onerror = lg.no;
+			req.onload = function(){
+				var res2 = JSON.parse(req.responseText);
+				lg.log(res2);
+				lg.assert(req.status == 200);
+				lg.assert(res2.email == user.email);
+				lg.assert(res2.first_name == user.first_name);
+				lg.assert(res2.last_name == user.last_name);
+				lg.assert(res2.phone == user.phone);
+				req = new XMLHttpRequest();
+				req.open("POST", "/create/user", true);
+				req.send(JSON.stringify(user));
+				req.onerror = lg.no;
+				req.onload = function(){
+					var res3 = JSON.parse(req.responseText);
+					lg.log(res3);
+					lg.assert(req.status == 400);
+					lg.yes(res.user_id);
+				}
+			}
+		}
+	},
+	createRide: function(lg, uid){
+		var ride = {
+			lat_start: 10.01,
+			lon_start: 10.01,
+			lat_end: 11.01,
+			lon_end: 11.01,
+			time_start: new Date().toISOString(),
+			places_count: 3
+		};
+		var req = new XMLHttpRequest();
+		req.open("POST", "/create/ride", true);
+		req.setRequestHeader("Authorization", uid);
+		lg.log(ride);
+		req.send(JSON.stringify(ride));
+		req.onerror = lg.no;
+		req.onload = function(){
+			var res = JSON.parse(req.responseText);
+			lg.log(res);
+			lg.assert(req.status == 201);
+			lg.assert(res.ride_id !== undefined);
+			req = new XMLHttpRequest();
+			
+		}
+	}
+};
+// -------------------------------------------------------------------------------------
+function addTest(title, f){
+	var div = document.createElement("div");
+	var but = document.createElement("button");
+	but.innerText = title;
+	div.appendChild(but);
+	var status = document.createElement("span");
+	div.appendChild(status);
+	function ups(w){
+		status.innerText = w;
+	}
+	
+	var lg = {
+		log: function(w){
+			console.log(w);
+		},
+		no: function(){
+			ups("Wrong!");
+		},
+		yes: function(w){
+			ups("Sucs!");
+			if(glb.after !== undefined){
+				glb.after.go(w);
+			}
+		},
+		assert: function(cond){
+			if(!cond){
+				lg.log("Wrong assert");
+				lg.no();
+				throw "Wrong assert";
+			}
+		}
+	};
+	var glb = {
+		go: function(w){
+			if(w === undefined){
+				w = glb.last;
+			} else {
+				glb.last = w;
+			}
+			ups("Running...");
+			f(lg, w);
+		},
+		setAfter: function(t){
+			glb.after = t;
+			return t;
+		}
+	};
+	but.onclick = function(){
+		glb.go();
+	}
+	tests.appendChild(div);
+	return glb;
+}
+window.onload = function(){
+	addTest("Create user", reqs.createUser)
+	.setAfter(addTest("Create ride", reqs.createRide));
+}
+</script>
 </head>
 <body>
 	<h3>Tests</h3>
+	<div id="tests"></div>
 </body>
 </html>
