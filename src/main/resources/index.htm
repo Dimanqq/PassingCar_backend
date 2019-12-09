@@ -108,7 +108,27 @@ var reqs = {
 						var res4 = JSON.parse(req.responseText);
 						lg.log(res4);
 						lg.assert(res4.error_code === 5);
-						lg.yes(uid);
+						req = new XMLHttpRequest();
+						req.open("DELETE", "/rides/" + res.ride_id + "/invite", true);
+						req.setRequestHeader("Authorization", uid);
+						req.send();
+						req.onerror = lg.no;
+						req.onload = function(){
+							var res5 = JSON.parse(req.responseText);
+							lg.log(res5);
+							lg.assert(res5.status === true);
+							req = new XMLHttpRequest();
+							req.open("DELETE", "/rides/" + res.ride_id + "/invite", true);
+							req.setRequestHeader("Authorization", uid);
+							req.send();
+							req.onerror = lg.no;
+							req.onload = function(){
+								var res6 = JSON.parse(req.responseText);
+								lg.log(res6);
+								lg.assert(res6.status === false);
+								lg.yes(uid);
+							}
+						}
 					}
 				}
 			}
