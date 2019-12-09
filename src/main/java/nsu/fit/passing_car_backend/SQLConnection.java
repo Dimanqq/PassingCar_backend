@@ -1,8 +1,9 @@
 package nsu.fit.passing_car_backend;
 
-import org.json.simple.JSONObject;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class SQLConnection {
     private Connection connection;
@@ -73,39 +74,5 @@ public class SQLConnection {
 
     public SQLStatement.Map runStatement(SQLStatement.Map data, SQLStatement statement) throws DataError {
         return statement.go(connection, data);
-    }
-
-    // halo
-    public JSONObject getRide(String rideId) throws SQLException {
-        JSONObject ride;
-        String startId, endId;
-        try (PreparedStatement statement = connection.prepareStatement
-                ("SELECT (point_start, point_end, time_start, places_count, creator_id) FROM \"ride\" WHERE ride.id::text = ?")) {
-            statement.setString(1, rideId);
-            ResultSet res = statement.executeQuery();   //  todo ride might be not found
-            ride = new JSONObject();
-            startId = res.getString(1);
-            endId = res.getString(2);
-            ride.put("time_start", res.getString(3));
-            ride.put("places_count", res.getString(4));
-            ride.put("creator_id", res.getString(5));
-
-            try (PreparedStatement s1 = connection.prepareStatement
-                    ("SELECT (point.lat, point.lon) FROM \"point\" WHERE point.id::text = ?")) {
-                statement.setString(1, startId);
-                ResultSet resPoint = s1.executeQuery();
-                ride.put("lat_start", resPoint.getString(1));
-                ride.put("lon_start", resPoint.getString(2));
-            }
-
-            try (PreparedStatement s2 = connection.prepareStatement
-                    ("SELECT (point.lat, point.lon) FROM \"point\" WHERE point.id::text = ?")) {
-                statement.setString(1, endId);
-                ResultSet resPoint = s2.executeQuery();
-                ride.put("lat_end", resPoint.getString(1));
-                ride.put("lon_end", resPoint.getString(2));
-            }
-            return ride;
-        }
     }
 }
