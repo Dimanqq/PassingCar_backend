@@ -161,13 +161,14 @@ var reqs = {
 				lg.log(res);
 				lg.assert(res.ride_id !== undefined);
 				lg.assert(req.status === 201);
-				cb(res.ride_id);
+				ride.id = res.ride_id;
+				cb(ride);
 			}
 		}
 		createRide(genRide(10.1, 11.1), function(ride1){
 			createRide(genRide(12.1, 13.1), function(ride2){
 				var req = new XMLHttpRequest();
-				req.open("GET", "/search?lat=10.1&lon=11.1", true);
+				req.open("GET", "/search?lat=" + ride1.lat_start + "&lon=" + ride1.lon_start, true);
 				req.setRequestHeader("Authorization", uid);
 				req.send();
 				req.onerror = lg.no;
@@ -175,19 +176,25 @@ var reqs = {
 					var res = JSON.parse(req.responseText);
 					lg.log(res);
 					lg.assert(req.status === 200);
+					lg.assert(res.rides !== undefined);
+					var res1 = res.rides.find(e => e.ride_id == ride1.id);
+					var res2 = res.rides.find(e => e.ride_id == ride2.id);
+					lg.assert(res1 !== undefined);
+					lg.assert(res2 === undefined);
+					lg.assert(res1.lat_start === ride1.lat_start);
+					lg.assert(res1.lon_start === ride1.lon_start);
 					lg.yes(uid);
 				}
 			});
 		});
 	},
 	createImage: function(lg, uid){
-		if(!lg.repr()){
-			return;
-		}
 		var inp = document.createElement("input");
 		inp.type = "file";
 		inp.click();
+		lg.repr();
 		inp.onchange = function(){
+			lg.noRepr();
 			var r = new XMLHttpRequest();
 			r.open("POST", "/create/image", true);
 			r.setRequestHeader("Content-Type", inp.files[0].type);
@@ -239,13 +246,10 @@ function addTest(title, f){
 			}
 		},
 		repr: function(){
-			if(lg.isRepr === undefined){
-				lg.isRepr = true;
-				ups("<< Press button pls");
-				return false;
-			}
-			delete lg.isRepr;
-			return true;
+			ups("<< Press button if you see this hint so long");
+		},
+		noRepr: function(){
+			ups("Running...");
 		}
 	};
 	var glb = {
