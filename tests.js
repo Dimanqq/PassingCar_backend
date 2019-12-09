@@ -1,6 +1,9 @@
-//var host = 'http://localhost:8080';
-var host = 'http://192.168.43.149:8080';
-var auth = "d27402b6-11b7-11ea-9e1c-0242ac110002";
+//var host = 'http://192.168.43.149:8080';
+var host = 'http://localhost:8080'; // local host
+//var host = 'http://13.95.133.166'; // dep host
+
+var auth = "d27402b6-11b7-11ea-9e1c-0242ac110002"; // test db
+//var auth = "1eb69c94-1341-11ea-9816-0242ac110002"; // dep db
 
 function regUser(cb){
 	var r = new XMLHttpRequest();

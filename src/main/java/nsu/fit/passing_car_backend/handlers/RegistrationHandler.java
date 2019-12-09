@@ -2,7 +2,8 @@ package nsu.fit.passing_car_backend.handlers;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
-import nsu.fit.passing_car_backend.DataError;
+import nsu.fit.passing_car_backend.DAL.CreateUserStatement;
+import nsu.fit.passing_car_backend.SQLStatement;
 import nsu.fit.passing_car_backend.ServerUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -25,21 +26,11 @@ public class RegistrationHandler implements HttpHandler {
                 exchange.getInputStream(),
                 StandardCharsets.UTF_8
         ));
-        JSONParser jsonParser = new JSONParser();
-        JSONObject o = (JSONObject) jsonParser.parse(reader);
-        String firstName = (String) o.get("first_name");
-        String lastName = (String) o.get("last_name");
-        String passw = (String) o.get("password");
-        String phone = (String) o.get("phone");
-        String email = (String) o.get("email");
-        try {
-            String id = serverUtils.sqlConnection.registerUser(firstName, lastName, passw, phone, email);
-            JSONObject idObject = new JSONObject();
-            idObject.put("user_id", id);
-            exchange.setStatusCode(201);
-            exchange.getResponseSender().send(idObject.toString());
-        } catch(DataError e){
-            e.send(exchange);// todo need response if data error
-        }
+        SQLStatement.Map data = SQLStatement.Map.fromJSON(
+                (JSONObject) new JSONParser().parse(reader)
+        );
+        data = serverUtils.sqlConnection.runStatement(data, new CreateUserStatement());
+        exchange.setStatusCode(201);
+        exchange.getResponseSender().send(data.toJSON().toString());
     }
 }
