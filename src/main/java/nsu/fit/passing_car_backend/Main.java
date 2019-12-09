@@ -55,7 +55,8 @@ public class Main {
                 .delete("/rides/{id}/invite", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new DeleteInviteHandler(serverUtils))
-                ));
+                ))
+                .get("/res", new BlockingHandler(new ResourcesHandler()));
 
         Undertow server = Undertow.builder().addHttpListener(8080,
                 "0.0.0.0").setHandler(mainHandler).build();
