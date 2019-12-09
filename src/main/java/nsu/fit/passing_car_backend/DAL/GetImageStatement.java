@@ -25,7 +25,7 @@ public class GetImageStatement extends SQLStatement {
         statement.setString(1, (String) data.get("image_id"));
         Map map;
         try (ResultSet res = statement.executeQuery()) {
-            if(!res.next()){
+            if (!res.next()) {
                 throw new DataError(DataError.NOT_FOUND, "Image not found");
             }
             map = new Map();

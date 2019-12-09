@@ -42,7 +42,7 @@ public class InviteRideStatement extends SQLStatement {
         statement.setString(2, (String) data.get("ride_id"));
         Map info;
         try (ResultSet res = statement.executeQuery()) {
-            if(!res.next()){
+            if (!res.next()) {
                 throw new DataError(DataError.NOT_FOUND, "Ride not found");
             }
             info = new Map();

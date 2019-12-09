@@ -3,7 +3,6 @@ package nsu.fit.passing_car_backend.DAL;
 import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.SQLStatement;
 
-import javax.xml.crypto.Data;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
