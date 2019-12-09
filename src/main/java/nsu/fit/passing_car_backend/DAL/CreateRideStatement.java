@@ -34,8 +34,9 @@ public class CreateRideStatement extends SQLStatement {
         statement.setString(3, (String) data.get("time_start"));
         statement.setInt(4, ((Long) data.get("places_count")).intValue());
         statement.setString(5, (String) data.get("creator_id"));
-        ResultSet res = statement.executeQuery();
-        res.next();
-        return Map.oneValue("ride_id", res.getString(1));
+        try (ResultSet res = statement.executeQuery()) {
+            res.next();
+            return Map.oneValue("ride_id", res.getString(1));
+        }
     }
 }

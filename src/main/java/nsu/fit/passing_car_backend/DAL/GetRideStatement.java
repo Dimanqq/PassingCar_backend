@@ -36,18 +36,20 @@ public class GetRideStatement extends SQLStatement {
     @Override
     protected Map run(PreparedStatement statement, Map data) throws SQLException, DataError {
         statement.setString(1, (String) data.get("ride_id"));
-        ResultSet res = statement.executeQuery();
-        if(!res.next()){
-            throw new DataError(DataError.NOT_FOUND, "Ride not found");
+        Map info;
+        try (ResultSet res = statement.executeQuery()) {
+            if (!res.next()) {
+                throw new DataError(DataError.NOT_FOUND, "Ride not found");
+            }
+            info = new Map();
+            info.put("time_start", res.getString(1));
+            info.put("places_count", res.getInt(2));
+            info.put("creator_id", res.getInt(3));
+            info.put("lat_start", res.getDouble(4));
+            info.put("lon_start", res.getDouble(5));
+            info.put("lat_end", res.getDouble(6));
+            info.put("lon_end", res.getDouble(7));
         }
-        Map info = new Map();
-        info.put("time_start", res.getString(1));
-        info.put("places_count", res.getInt(2));
-        info.put("creator_id", res.getInt(3));
-        info.put("lat_start", res.getDouble(4));
-        info.put("lon_start", res.getDouble(5));
-        info.put("lat_end", res.getDouble(6));
-        info.put("lon_end", res.getDouble(7));
         return info;
     }
 }

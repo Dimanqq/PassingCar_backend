@@ -3,6 +3,7 @@ package nsu.fit.passing_car_backend.DAL;
 import nsu.fit.passing_car_backend.SQLStatement;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserValidateStatement extends SQLStatement {
@@ -19,6 +20,8 @@ public class UserValidateStatement extends SQLStatement {
     @Override
     protected Map run(PreparedStatement statement, Map data) throws SQLException {
         statement.setString(1, (String) data.get("userId"));
-        return Map.oneValue(statement.executeQuery().next());
+        try (ResultSet res = statement.executeQuery()) {
+            return Map.oneValue(res.next());
+        }
     }
 }

@@ -25,8 +25,9 @@ public class CreateImageStatement extends SQLStatement {
     protected Map run(PreparedStatement statement, Map data) throws SQLException {
         statement.setString(1, (String) data.get("mimeType"));
         statement.setBinaryStream(2, (InputStream) data.get("stream"));
-        ResultSet res = statement.executeQuery();
-        res.next();
-        return Map.oneValue("image_id", res.getString(1));
+        try (ResultSet res = statement.executeQuery()) {
+            res.next();
+            return Map.oneValue("image_id", res.getString(1));
+        }
     }
 }

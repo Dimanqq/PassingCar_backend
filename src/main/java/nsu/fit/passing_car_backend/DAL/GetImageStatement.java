@@ -22,11 +22,13 @@ public class GetImageStatement extends SQLStatement {
     @Override
     protected Map run(PreparedStatement statement, Map data) throws SQLException {
         statement.setString(1, (String) data.get("image_id"));
-        ResultSet res = statement.executeQuery();   //  todo image might be not found
-        res.next();
-        Map map = new Map();
-        map.put("mimeType", res.getString(1));
-        map.put("stream", res.getBinaryStream(2));
+        Map map;
+        try (ResultSet res = statement.executeQuery()) {
+            res.next();
+            map = new Map();
+            map.put("mimeType", res.getString(1));
+            map.put("stream", res.getBinaryStream(2));
+        }
         return map;
     }
 }
