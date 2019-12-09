@@ -138,6 +138,48 @@ var reqs = {
 			}
 		}
 	},
+	searchRide: function(lg, uid){
+		function genRide(lat, lon){
+			return {
+				lat_start: lat,
+				lon_start: lon,
+				lat_end: Math.random(),
+				lon_end: Math.random(),
+				time_start: new Date().toISOString(),
+				places_count: 3
+			}
+		}
+		function createRide(ride, cb){
+			var req = new XMLHttpRequest();
+			req.open("POST", "/create/ride", true);
+			req.setRequestHeader("Authorization", uid);
+			lg.log(ride);
+			req.send(JSON.stringify(ride));
+			req.onerror = lg.no;
+			req.onload = function(){
+				var res = JSON.parse(req.responseText);
+				lg.log(res);
+				lg.assert(res.ride_id !== undefined);
+				lg.assert(req.status === 201);
+				cb(res.ride_id);
+			}
+		}
+		createRide(genRide(10.1, 11.1), function(ride1){
+			createRide(genRide(12.1, 13.1), function(ride2){
+				var req = new XMLHttpRequest();
+				req.open("GET", "/search?lat=10.1&lon=11.1", true);
+				req.setRequestHeader("Authorization", uid);
+				req.send();
+				req.onerror = lg.no;
+				req.onload = function(){
+					var res = JSON.parse(req.responseText);
+					lg.log(res);
+					lg.assert(req.status === 200);
+					lg.yes(uid);
+				}
+			});
+		});
+	},
 	createImage: function(lg, uid){
 		if(!lg.repr()){
 			return;
@@ -181,6 +223,7 @@ function addTest(title, f){
 		},
 		no: function(){
 			ups("Wrong!");
+			console.trace();
 		},
 		yes: function(w){
 			ups("Sucs!");
@@ -229,6 +272,7 @@ function addTest(title, f){
 window.onload = function(){
 	addTest("Create user", reqs.createUser)
 	.setAfter(addTest("Create ride", reqs.createRide))
+	.setAfter(addTest("Search ride", reqs.searchRide))
 	.setAfter(addTest("Create image", reqs.createImage));
 }
 </script>
