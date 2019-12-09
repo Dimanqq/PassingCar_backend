@@ -1,8 +1,16 @@
 package nsu.fit.passing_car_backend;
 
+import io.undertow.server.HttpServerExchange;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.postgresql.util.PSQLException;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -72,6 +80,27 @@ public abstract class SQLStatement {
             Map map = new Map();
             copy(data, map);
             return map;
+        }
+
+        public static Map fromExchangeJSON(HttpServerExchange exchange) throws DataError {
+            Reader reader = new BufferedReader(new InputStreamReader(
+                    exchange.getInputStream(),
+                    StandardCharsets.UTF_8
+            ));
+            try {
+                return Map.fromJSON((JSONObject) new JSONParser().parse(reader));
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new DataError(DataError.UNKNOWN_ERROR, "JSON read");
+            } catch (ParseException e) {
+                throw new DataError(DataError.MISSED_FIELD, "Wrong JSON");
+            } finally {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         public Object value() {

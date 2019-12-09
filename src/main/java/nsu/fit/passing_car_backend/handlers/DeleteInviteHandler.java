@@ -13,6 +13,6 @@ public class DeleteInviteHandler implements HttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange httpServerExchange) throws Exception {
-
+        // TODO write
     }
 }

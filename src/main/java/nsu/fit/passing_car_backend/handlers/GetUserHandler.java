@@ -2,7 +2,6 @@ package nsu.fit.passing_car_backend.handlers;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
-import nsu.fit.passing_car_backend.DAL.GetImageStatement;
 import nsu.fit.passing_car_backend.DAL.GetUserStatement;
 import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.SQLStatement;
@@ -16,7 +15,7 @@ public class GetUserHandler implements HttpHandler {
     }
 
     @Override
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
+    public void handleRequest(HttpServerExchange exchange) {
         try {
             SQLStatement.Map data = SQLStatement.Map.oneValue(
                     "user_id",
@@ -25,7 +24,7 @@ public class GetUserHandler implements HttpHandler {
             data = serverUtils.sqlConnection.runStatement(data, new GetUserStatement());
             exchange.setStatusCode(200);
             exchange.getResponseSender().send(data.toJSON().toString());
-        } catch (DataError e){
+        } catch (DataError e) {
             e.send(exchange);
         }
     }
