@@ -22,7 +22,12 @@ public class DeleteInviteHandler implements HttpHandler {
             data.put("ride_id", exchange.getQueryParameters().get("id").getFirst());
             data.put("user_id", exchange.getRequestHeaders().get("Authorization").getFirst());
             data = serverUtils.sqlConnection.runStatement(data, new DeleteInviteStatement());
-            exchange.getResponseSender().send(data.toJSON().toString());
+            if((Boolean) data.get("status")) {
+                exchange.setStatusCode(202);
+                exchange.getResponseSender().send(data.toJSON().toString());
+            } else {
+                throw new DataError(DataError.NOT_FOUND, "User not in ride");
+            }
         } catch (DataError e){
             e.send(exchange);
         }

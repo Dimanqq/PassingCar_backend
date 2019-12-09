@@ -99,6 +99,7 @@ var reqs = {
 					var res3 = JSON.parse(req.responseText);
 					lg.log(res3);
 					lg.assert(res3.free_places === res2.places_count - 1);
+					lg.assert(req.status === 201);
 					req = new XMLHttpRequest();
 					req.open("POST", "/rides/" + res.ride_id + "/invite", true);
 					req.setRequestHeader("Authorization", uid);
@@ -107,6 +108,7 @@ var reqs = {
 					req.onload = function(){
 						var res4 = JSON.parse(req.responseText);
 						lg.log(res4);
+						lg.assert(req.status === 400);
 						lg.assert(res4.error_code === 5);
 						req = new XMLHttpRequest();
 						req.open("DELETE", "/rides/" + res.ride_id + "/invite", true);
@@ -116,6 +118,7 @@ var reqs = {
 						req.onload = function(){
 							var res5 = JSON.parse(req.responseText);
 							lg.log(res5);
+							lg.assert(req.status === 202);
 							lg.assert(res5.status === true);
 							req = new XMLHttpRequest();
 							req.open("DELETE", "/rides/" + res.ride_id + "/invite", true);
@@ -125,7 +128,8 @@ var reqs = {
 							req.onload = function(){
 								var res6 = JSON.parse(req.responseText);
 								lg.log(res6);
-								lg.assert(res6.status === false);
+								lg.assert(req.status === 400);
+								lg.assert(res6.error_code === 8);
 								lg.yes(uid);
 							}
 						}
