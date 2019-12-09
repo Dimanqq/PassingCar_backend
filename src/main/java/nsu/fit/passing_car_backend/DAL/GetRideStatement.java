@@ -22,7 +22,7 @@ public class GetRideStatement extends SQLStatement {
         return "SELECT " +
                 "ride.time_start, " +
                 "ride.places_count, " +
-                "ride.creator_id::text, " +
+                "ride.creator_id::text  , " +
                 "point_start.lat, " +
                 "point_start.lon, " +
                 "point_end.lat, " +

@@ -23,10 +23,10 @@ public class InviteRideHandler implements HttpHandler {
             data.put("user_id", exchange.getRequestHeaders().get("Authorization").getFirst());
             SQLStatement.Map res = serverUtils.sqlConnection.runStatement(data, new InviteRideStatement());
             if (((Boolean) res.get("already_invite"))) {
-                throw new DataError(DataError.ALREADY_INVITE, "");
+                throw new DataError(DataError.ALREADY_INVITE, "Already invite");
             }
             if (((Integer) res.get("free_places")) == 0) {
-                throw new DataError(DataError.NO_FREE_PLACES, "");
+                throw new DataError(DataError.NO_FREE_PLACES, "No free places");
             }
             serverUtils.sqlConnection.runStatement(data, new InviteRideAddStatement());
             exchange.setStatusCode(201);

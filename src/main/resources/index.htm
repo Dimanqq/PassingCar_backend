@@ -90,6 +90,50 @@ var reqs = {
 				lg.assert(ride.time_start === res2.time_start);
 				lg.assert(ride.places_count === res2.places_count);
 				lg.assert(uid === res2.creator_id);
+				req = new XMLHttpRequest();
+				req.open("POST", "/rides/" + res.ride_id + "/invite", true);
+				req.setRequestHeader("Authorization", uid);
+				req.send();
+				req.onerror = lg.no;
+				req.onload = function(){
+					var res3 = JSON.parse(req.responseText);
+					lg.log(res3);
+					lg.assert(res3.free_places === res2.places_count - 1);
+					req = new XMLHttpRequest();
+					req.open("POST", "/rides/" + res.ride_id + "/invite", true);
+					req.setRequestHeader("Authorization", uid);
+					req.send();
+					req.onerror = lg.no;
+					req.onload = function(){
+						var res4 = JSON.parse(req.responseText);
+						lg.log(res4);
+						lg.assert(res4.error_code === 5);
+						lg.yes(uid);
+					}
+				}
+			}
+		}
+	},
+	createImage: function(lg, uid){
+		if(!lg.repr()){
+			return;
+		}
+		var inp = document.createElement("input");
+		inp.type = "file";
+		inp.click();
+		inp.onchange = function(){
+			var r = new XMLHttpRequest();
+			r.open("POST", "/create/image", true);
+			r.setRequestHeader("Content-Type", inp.files[0].type);
+			r.setRequestHeader("Authorization", uid);
+			r.send(inp.files[0]);
+			r.onerror = lg.no;
+			r.onload = function(){
+				var res = JSON.parse(r.responseText);
+				lg.log(res);
+				lg.assert(r.status === 201);
+				lg.assert(res.image_id !== undefined);
+				window.open("/images/" + res.image_id);
 				lg.yes(uid);
 			}
 		}
@@ -126,6 +170,15 @@ function addTest(title, f){
 				lg.no();
 				throw "Wrong assert";
 			}
+		},
+		repr: function(){
+			if(lg.isRepr === undefined){
+				lg.isRepr = true;
+				ups("<< Press button pls");
+				return false;
+			}
+			delete lg.isRepr;
+			return true;
 		}
 	};
 	var glb = {
@@ -151,7 +204,8 @@ function addTest(title, f){
 }
 window.onload = function(){
 	addTest("Create user", reqs.createUser)
-	.setAfter(addTest("Create ride", reqs.createRide));
+	.setAfter(addTest("Create ride", reqs.createRide))
+	.setAfter(addTest("Create image", reqs.createImage));
 }
 </script>
 </head>
