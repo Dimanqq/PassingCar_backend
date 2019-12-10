@@ -118,13 +118,11 @@ public abstract class SQLStatement {
                     data.put(key, Double.valueOf(d));
                     continue;
                 } catch (NumberFormatException ignored) {
-
                 }
                 try {
                     data.put(key, Integer.valueOf(d));
                     continue;
-                } catch (NumberFormatException ignored) {
-
+                } catch (NumberFormatException ignored){
                 }
                 data.put(key, d);
             }
