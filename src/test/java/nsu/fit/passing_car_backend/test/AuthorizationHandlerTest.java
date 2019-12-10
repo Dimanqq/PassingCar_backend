@@ -12,25 +12,25 @@ public class AuthorizationHandlerTest {
 
     @Test
     public void handleRequest() {
-        /*URL url;
+        URL url;
         try {
             url = new URL("http://localhost:8080/create/user");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setDoOutput(true);
             con.setRequestMethod("POST");
             JSONObject o = new JSONObject();
-            o.put("first_name", "Vlasov");
-            o.put("last_name", "Ivan");
-            o.put("password", "12345");
-            o.put("phone", "999999999");
-            o.put("email", "email@yandex.ru");
+            o.put("first_name", "Doytrrv");
+            o.put("last_name", "Iaeewn");
+            o.put("password", "14wew5");
+            o.put("phone", "54346575");
+            o.put("email", "r334522@yandex.ru");
             OutputStream out = con.getOutputStream();
             out.write(o.toString().getBytes(StandardCharsets.UTF_8));
-            con.addRequestProperty("first_name", "Vlasov");
+            /*con.addRequestProperty("first_name", "Vlasov");
             con.addRequestProperty("last_name", "Ivan");
             con.addRequestProperty("password", "12345");
             con.addRequestProperty("phone", "999999999");
-            con.addRequestProperty("email", "email@yandex.ru");
+            con.addRequestProperty("email", "email@yandex.ru");*/
 
             InputStream stream = con.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
@@ -39,6 +39,6 @@ public class AuthorizationHandlerTest {
 
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 }

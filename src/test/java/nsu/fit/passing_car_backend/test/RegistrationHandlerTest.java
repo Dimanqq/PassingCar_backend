@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 public class RegistrationHandlerTest {
 
     @Test
-    public void handleRequest() {
+    public void correctRequest() {
         URL url;
         try {
             url = new URL("http://localhost:8080/create/user");
@@ -25,21 +25,22 @@ public class RegistrationHandlerTest {
             con.setDoOutput(true);
             con.setRequestMethod("POST");
             JSONObject o = new JSONObject();
-            o.put("first_name", "Vlasov");
-            o.put("last_name", "Ivan");
-            o.put("password", "12345");
-            o.put("phone", new Random().nextInt());
-            o.put("email", new Random().nextInt() + "@yandex.ru");
+            o.put("first_name", "Kirill");
+            o.put("last_name", "Matveev");
+            o.put("password", "1111111");
+            o.put("phone", String.valueOf(new Random().nextInt()));
+            o.put("email", String.valueOf(new Random().nextInt()));
             OutputStream out = con.getOutputStream();
             out.write(o.toString().getBytes(StandardCharsets.UTF_8));
             InputStream stream = con.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-            System.out.println(br.readLine());
             JSONParser p = new JSONParser();
             JSONObject res = (JSONObject) p.parse(br);
             assertNotNull(res.get("user_id"));
+            assertEquals(201, con.getResponseCode());
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
     }
+
 }
