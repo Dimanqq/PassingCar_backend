@@ -17,7 +17,7 @@ public class Main {
             serverUtils = new ServerUtils();
             serverUtils.sqlConnection = new SQLConnection(SQLCreds.loadFromEnv());
             serverUtils.sqlConnection.initDB();
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (SQLException e) {
             log.error("", e);
             return;
         }

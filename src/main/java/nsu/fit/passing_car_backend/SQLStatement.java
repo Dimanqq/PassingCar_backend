@@ -20,7 +20,7 @@ import java.util.HashMap;
 public abstract class SQLStatement {
     private static final Logger log = Logger.getLogger(SQLStatement.class);
 
-    protected abstract  AssertMap getAssert();
+    protected abstract AssertMap getAssert();
 
     protected abstract String getSQL();
 
@@ -31,7 +31,7 @@ public abstract class SQLStatement {
         if (types == null) {
             return;
         }
-        for (Map.Entry<String,Object> entry : data.entrySet()) {
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
             if (!types.containsKey(entry.getKey())) {
                 throw new DataError(DataError.UNKNOWN_FIELD, entry.getKey());
             }
@@ -41,14 +41,14 @@ public abstract class SQLStatement {
                 throw new DataError(DataError.WRONG_TYPE_FIELD, entry.getKey());
             }
         }
-        for (Map.Entry<String,Object> entry : data.entrySet()) {
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
             if (!data.containsKey(entry.getKey()) || data.get(entry.getKey()) == null) {
                 throw new DataError(DataError.MISSED_FIELD, entry.getKey());
             }
         }
     }
 
-    public Map go(Connection connection, Map data) throws DataError {
+    Map go(Connection connection, Map data) throws DataError {
         goAssert(data);
         try (PreparedStatement statement = connection.prepareStatement(getSQL())) {
             return run(statement, data);
@@ -84,7 +84,7 @@ public abstract class SQLStatement {
             }
         }
 
-        public static Map fromJSON(JSONObject data) {
+        static Map fromJSON(JSONObject data) {
             Map map = new Map();
             copy(data, map);
             return map;
@@ -123,7 +123,7 @@ public abstract class SQLStatement {
                 try {
                     data.put(key, Integer.valueOf(d));
                     continue;
-                } catch (NumberFormatException ignored){
+                } catch (NumberFormatException ignored) {
                 }
                 data.put(key, d);
             }
