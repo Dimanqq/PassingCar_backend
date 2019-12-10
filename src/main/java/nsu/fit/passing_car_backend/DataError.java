@@ -4,17 +4,17 @@ import io.undertow.server.HttpServerExchange;
 import org.json.simple.JSONObject;
 
 public class DataError extends Exception {
-    public final static int UNKNOWN_FIELD = 1;
-    public final static int WRONG_TYPE_FIELD = 2;
-    public final static int MISSED_FIELD = 3;
-    public final static int UNKNOWN_ERROR = 4;
-    public final static int ALREADY_INVITE = 5;
-    public final static int NO_FREE_PLACES = 6;
-    public final static int UNAUTHORIZED = 7;
-    public final static int NOT_FOUND = 8;
-    public final static int DUPLICATE = 9;
-    private int code;
-    private String desc;
+    public static final int MISSED_FIELD = 3;
+    public static final int ALREADY_INVITE = 5;
+    public static final int NO_FREE_PLACES = 6;
+    public static final int UNAUTHORIZED = 7;
+    public static final int NOT_FOUND = 8;
+    static final int UNKNOWN_FIELD = 1;
+    static final int WRONG_TYPE_FIELD = 2;
+    static final int UNKNOWN_ERROR = 4;
+    static final int DUPLICATE = 9;
+    private final int code;
+    private final String desc;
 
     public DataError(int code, String desc) {
         super(desc + " [" + code + "]");
