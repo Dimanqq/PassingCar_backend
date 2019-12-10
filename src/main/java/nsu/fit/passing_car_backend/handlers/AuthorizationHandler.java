@@ -3,12 +3,14 @@ package nsu.fit.passing_car_backend.handlers;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderValues;
-import nsu.fit.passing_car_backend.dal.UserValidateStatement;
 import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.SQLStatement;
 import nsu.fit.passing_car_backend.ServerUtils;
+import nsu.fit.passing_car_backend.dal.UserValidateStatement;
+import org.apache.log4j.Logger;
 
 public class AuthorizationHandler implements HttpHandler {
+    private static final Logger log = Logger.getLogger(AuthorizationHandler.class);
     private ServerUtils serverUtils;
     private HttpHandler httpHandler;
 
@@ -32,7 +34,7 @@ public class AuthorizationHandler implements HttpHandler {
             }
             httpHandler.handleRequest(exchange);
         } catch (DataError e) {
-            e.printStackTrace();
+            log.error("Data error", e);
             e.send(exchange);
         }
     }
