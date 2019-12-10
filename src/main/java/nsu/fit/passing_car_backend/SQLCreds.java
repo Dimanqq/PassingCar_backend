@@ -1,5 +1,7 @@
 package nsu.fit.passing_car_backend;
 
+import org.apache.log4j.Logger;
+
 import java.util.Map;
 
 public class SQLCreds {
@@ -8,6 +10,7 @@ public class SQLCreds {
     String db;
     String user;
     String password;
+    private static final Logger log = Logger.getLogger(SQLCreds.class);
 
     private SQLCreds() {
     }
@@ -25,7 +28,7 @@ public class SQLCreds {
     }
 
     private void outInfo() {
-        System.out.println(
+        log.info(
                 "Connect to " + ip + ":" + port + "\n" +
                         "U[" + user + "] DB[" + db + "]"
         );

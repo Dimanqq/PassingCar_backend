@@ -5,18 +5,20 @@ import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.BlockingHandler;
 import nsu.fit.passing_car_backend.handlers.*;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) {
+        final Logger log = Logger.getLogger(Main.class);
         final ServerUtils serverUtils;
         try {
             serverUtils = new ServerUtils();
             serverUtils.sqlConnection = new SQLConnection(SQLCreds.loadFromEnv());
             serverUtils.sqlConnection.initDB();
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            log.error("", e);
             return;
         }
 

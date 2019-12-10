@@ -8,8 +8,8 @@ import java.sql.SQLException;
 public class SQLConnection {
     private Connection connection;
 
-    SQLConnection(SQLCreds creds) throws SQLException, ClassNotFoundException {
-        Class.forName("org.postgresql.Driver");
+    SQLConnection(SQLCreds creds) throws SQLException {
+
         connection = DriverManager
                 .getConnection("jdbc:postgresql://" + creds.ip +
                                 ":" + creds.port + "/" + creds.db,
