@@ -29,19 +29,19 @@ public abstract class SQLStatement {
         if (types == null) {
             return;
         }
-        for (String key : data.keySet()) {
-            if (!types.containsKey(key)) {
-                throw new DataError(DataError.UNKNOWN_FIELD, key);
+        for (Map.Entry<String,Object> entry : data.entrySet()) {
+            if (!types.containsKey(entry.getKey())) {
+                throw new DataError(DataError.UNKNOWN_FIELD, entry.getKey());
             }
             try {
-                types.get(key).cast(data.get(key));
+                types.get(entry.getKey()).cast(data.get(entry.getKey()));
             } catch (ClassCastException e) {
-                throw new DataError(DataError.WRONG_TYPE_FIELD, key);
+                throw new DataError(DataError.WRONG_TYPE_FIELD, entry.getKey());
             }
         }
-        for (String key : types.keySet()) {
-            if (!data.containsKey(key) || data.get(key) == null) {
-                throw new DataError(DataError.MISSED_FIELD, key);
+        for (Map.Entry<String,Object> entry : data.entrySet()) {
+            if (!data.containsKey(entry.getKey()) || data.get(entry.getKey()) == null) {
+                throw new DataError(DataError.MISSED_FIELD, entry.getKey());
             }
         }
     }
