@@ -3,7 +3,7 @@ package nsu.fit.passing_car_backend.handlers;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
-import nsu.fit.passing_car_backend.DAL.GetImageStatement;
+import nsu.fit.passing_car_backend.dal.GetImageStatement;
 import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.SQLStatement;
 import nsu.fit.passing_car_backend.ServerUtils;

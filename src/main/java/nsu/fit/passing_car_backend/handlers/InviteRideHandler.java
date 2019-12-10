@@ -2,8 +2,8 @@ package nsu.fit.passing_car_backend.handlers;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
-import nsu.fit.passing_car_backend.DAL.InviteRideAddStatement;
-import nsu.fit.passing_car_backend.DAL.InviteRideStatement;
+import nsu.fit.passing_car_backend.dal.InviteRideAddStatement;
+import nsu.fit.passing_car_backend.dal.InviteRideStatement;
 import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.SQLStatement;
 import nsu.fit.passing_car_backend.ServerUtils;
