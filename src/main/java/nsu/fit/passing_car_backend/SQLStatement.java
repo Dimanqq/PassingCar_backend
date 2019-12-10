@@ -98,7 +98,7 @@ public abstract class SQLStatement {
             try {
                 return Map.fromJSON((JSONObject) new JSONParser().parse(reader));
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("JSON reading error");
                 throw new DataError(DataError.UNKNOWN_ERROR, "JSON read");
             } catch (ParseException e) {
                 throw new DataError(DataError.MISSED_FIELD, "Wrong JSON");
