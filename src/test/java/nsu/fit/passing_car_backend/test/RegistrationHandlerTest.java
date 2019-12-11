@@ -1,17 +1,23 @@
 package nsu.fit.passing_car_backend.test;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
 
-public class AuthorizationHandlerTest {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class RegistrationHandlerTest {
 
     @Test
-    public void handleRequest() {
+    public void correctRequest() {
         URL url;
         try {
             url = new URL("http://localhost:8080/create/user");
@@ -19,26 +25,22 @@ public class AuthorizationHandlerTest {
             con.setDoOutput(true);
             con.setRequestMethod("POST");
             JSONObject o = new JSONObject();
-            o.put("first_name", "Doytrrv");
-            o.put("last_name", "Iaeewn");
-            o.put("password", "14wew5");
-            o.put("phone", "54346575");
-            o.put("email", "r334522@yandex.ru");
+            o.put("first_name", "Kirill");
+            o.put("last_name", "Matveev");
+            o.put("password", "1111111");
+            o.put("phone", String.valueOf(new Random().nextInt()));
+            o.put("email", String.valueOf(new Random().nextInt()));
             OutputStream out = con.getOutputStream();
             out.write(o.toString().getBytes(StandardCharsets.UTF_8));
-            /*con.addRequestProperty("first_name", "Vlasov");
-            con.addRequestProperty("last_name", "Ivan");
-            con.addRequestProperty("password", "12345");
-            con.addRequestProperty("phone", "999999999");
-            con.addRequestProperty("email", "email@yandex.ru");*/
-
             InputStream stream = con.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-            System.out.println(con.getRequestProperty("user_id"));
-            System.out.println(br.readLine());
-
-        } catch (IOException e) {
+            JSONParser p = new JSONParser();
+            JSONObject res = (JSONObject) p.parse(br);
+            assertNotNull(res.get("user_id"));
+            assertEquals(201, con.getResponseCode());
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
     }
+
 }
