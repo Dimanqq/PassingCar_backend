@@ -7,10 +7,10 @@ import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.SQLStatement;
 import nsu.fit.passing_car_backend.ServerUtils;
 import nsu.fit.passing_car_backend.dal.UserValidateStatement;
-import org.apache.log4j.Logger;
+
+import static java.lang.System.err;
 
 public class AuthorizationHandler implements HttpHandler {
-    private static final Logger log = Logger.getLogger(AuthorizationHandler.class);
     private ServerUtils serverUtils;
     private HttpHandler httpHandler;
 
@@ -34,7 +34,8 @@ public class AuthorizationHandler implements HttpHandler {
             }
             httpHandler.handleRequest(exchange);
         } catch (DataError e) {
-            log.error("Data error", e);
+            e.printStackTrace();
+            err.println("Data error");
             e.send(exchange);
         }
     }

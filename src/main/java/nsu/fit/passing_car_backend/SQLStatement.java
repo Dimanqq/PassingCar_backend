@@ -1,7 +1,6 @@
 package nsu.fit.passing_car_backend;
 
 import io.undertow.server.HttpServerExchange;
-import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -18,7 +17,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 public abstract class SQLStatement {
-    private static final Logger log = Logger.getLogger(SQLStatement.class);
 
     protected abstract AssertMap getAssert();
 
@@ -59,10 +57,11 @@ public abstract class SQLStatement {
                     throw new DataError(DataError.DUPLICATE, constraint);
                 }
             }
-            log.error(getSQL());
+            System.err.println(getSQL());
             throw new DataError(DataError.UNKNOWN_ERROR, "PSQLException");
         } catch (SQLException e) {
-            log.error("SQLException", e);
+            e.printStackTrace();
+            System.err.println("SQLException");
             throw new DataError(DataError.UNKNOWN_ERROR, "SQLException");
         }
     }
@@ -98,7 +97,7 @@ public abstract class SQLStatement {
             try {
                 return Map.fromJSON((JSONObject) new JSONParser().parse(reader));
             } catch (IOException e) {
-                log.error("JSON reading error");
+                System.err.println("JSON reading error");
                 throw new DataError(DataError.UNKNOWN_ERROR, "JSON read");
             } catch (ParseException e) {
                 throw new DataError(DataError.MISSED_FIELD, "Wrong JSON");
@@ -106,7 +105,8 @@ public abstract class SQLStatement {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.error("IO", e);
+                    e.printStackTrace();
+                    System.err.println("IO");
                 }
             }
         }

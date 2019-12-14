@@ -1,8 +1,10 @@
 package nsu.fit.passing_car_backend.test;
 
+import nsu.fit.passing_car_backend.Main;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.*;
@@ -15,9 +17,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class RegistrationHandlerTest {
+    @BeforeClass
+    public static void runServer() {
+
+    }
 
     @Test
     public void correctRequest() {
+        new Thread(() -> Main.main(new String[]{})).run();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+
+        }
         URL url;
         try {
             url = new URL("http://localhost:8080/create/user");
@@ -32,10 +44,12 @@ public class RegistrationHandlerTest {
             o.put("email", String.valueOf(new Random().nextInt()));
             OutputStream out = con.getOutputStream();
             out.write(o.toString().getBytes(StandardCharsets.UTF_8));
+
             InputStream stream = con.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
             JSONParser p = new JSONParser();
             JSONObject res = (JSONObject) p.parse(br);
+
             assertNotNull(res.get("user_id"));
             assertEquals(201, con.getResponseCode());
         } catch (IOException | ParseException e) {
