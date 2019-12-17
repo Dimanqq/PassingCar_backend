@@ -16,7 +16,7 @@ import java.util.Random;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class RegistrationHandlerTest {
+public class RegistrationTest {
     @BeforeClass
     public static void init(){
         Initializer.init();

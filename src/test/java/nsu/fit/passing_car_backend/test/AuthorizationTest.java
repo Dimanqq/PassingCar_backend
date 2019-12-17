@@ -10,7 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class AuthorizationHandlerTest {
+public class AuthorizationTest {
     @BeforeClass
     static public void init(){
         Initializer.init();
