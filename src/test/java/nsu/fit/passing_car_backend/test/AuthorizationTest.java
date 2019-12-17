@@ -1,6 +1,8 @@
 package nsu.fit.passing_car_backend.test;
 
+import nsu.fit.passing_car_backend.Initializer;
 import org.json.simple.JSONObject;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.*;
@@ -8,7 +10,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public class AuthorizationHandlerTest {
+public class AuthorizationTest {
+    @BeforeClass
+    static public void init(){
+        Initializer.init();
+    }
 
     @Test
     public void handleRequest() {

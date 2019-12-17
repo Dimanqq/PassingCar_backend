@@ -2,12 +2,12 @@ package nsu.fit.passing_car_backend.handlers;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ResourcesHandler implements HttpHandler {
-    private static final Logger log = Logger.getLogger(ResourcesHandler.class);
 
     @Override
     public void handleRequest(HttpServerExchange exchange) {
@@ -19,7 +19,7 @@ public class ResourcesHandler implements HttpHandler {
                     .getResourceAsStream("index.htm")
                     .transferTo(exchange.getOutputStream());
         } catch (IOException e) {
-            log.error("Server error", e);
+            Logger.getAnonymousLogger().log(Level.SEVERE, "Load res error", e);
             exchange.setStatusCode(500);
             exchange.getResponseSender().send("Server error");
         }

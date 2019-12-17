@@ -1,8 +1,10 @@
 package nsu.fit.passing_car_backend.test;
 
+import nsu.fit.passing_car_backend.Initializer;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.*;
@@ -14,7 +16,11 @@ import java.util.Random;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class RegistrationHandlerTest {
+public class RegistrationTest {
+    @BeforeClass
+    public static void init(){
+        Initializer.init();
+    }
 
     @Test
     public void correctRequest() {

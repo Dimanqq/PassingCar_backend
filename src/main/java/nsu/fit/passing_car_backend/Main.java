@@ -5,20 +5,22 @@ import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.BlockingHandler;
 import nsu.fit.passing_car_backend.handlers.*;
-import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
+    static final private Logger logger = Logger.getLogger(Main.class.getName());
+
     public static void main(String[] args) {
-        final Logger log = Logger.getLogger(Main.class);
         final ServerUtils serverUtils;
         try {
             serverUtils = new ServerUtils();
             serverUtils.sqlConnection = new SQLConnection(SQLCreds.loadFromEnv());
             serverUtils.sqlConnection.initDB();
         } catch (SQLException e) {
-            log.error("", e);
+            logger.log(Level.SEVERE, "DB init", e);
             return;
         }
 
