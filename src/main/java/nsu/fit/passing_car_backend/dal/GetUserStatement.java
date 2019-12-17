@@ -1,4 +1,4 @@
-package nsu.fit.passing_car_backend.DAL;
+package nsu.fit.passing_car_backend.dal;
 
 import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.SQLStatement;

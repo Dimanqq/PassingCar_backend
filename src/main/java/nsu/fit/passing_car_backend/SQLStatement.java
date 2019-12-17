@@ -1,6 +1,7 @@
 package nsu.fit.passing_car_backend;
 
 import io.undertow.server.HttpServerExchange;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -17,36 +18,37 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 public abstract class SQLStatement {
+    private static final Logger log = Logger.getLogger(SQLStatement.class);
 
-    abstract protected AssertMap getAssert();
+    protected abstract AssertMap getAssert();
 
-    abstract protected String getSQL();
+    protected abstract String getSQL();
 
-    abstract protected Map run(PreparedStatement statement, Map data) throws SQLException, DataError;
+    protected abstract Map run(PreparedStatement statement, Map data) throws SQLException, DataError;
 
     private void goAssert(Map data) throws DataError {
         AssertMap types = getAssert();
         if (types == null) {
             return;
         }
-        for (String key : data.keySet()) {
-            if (!types.containsKey(key)) {
-                throw new DataError(DataError.UNKNOWN_FIELD, key);
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            if (!types.containsKey(entry.getKey())) {
+                throw new DataError(DataError.UNKNOWN_FIELD, entry.getKey());
             }
             try {
-                types.get(key).cast(data.get(key));
+                types.get(entry.getKey()).cast(data.get(entry.getKey()));
             } catch (ClassCastException e) {
-                throw new DataError(DataError.WRONG_TYPE_FIELD, key);
+                throw new DataError(DataError.WRONG_TYPE_FIELD, entry.getKey());
             }
         }
-        for (String key : types.keySet()) {
-            if (!data.containsKey(key) || data.get(key) == null) {
-                throw new DataError(DataError.MISSED_FIELD, key);
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            if (!data.containsKey(entry.getKey()) || data.get(entry.getKey()) == null) {
+                throw new DataError(DataError.MISSED_FIELD, entry.getKey());
             }
         }
     }
 
-    public Map go(Connection connection, Map data) throws DataError {
+    Map go(Connection connection, Map data) throws DataError {
         goAssert(data);
         try (PreparedStatement statement = connection.prepareStatement(getSQL())) {
             return run(statement, data);
@@ -57,11 +59,10 @@ public abstract class SQLStatement {
                     throw new DataError(DataError.DUPLICATE, constraint);
                 }
             }
-            e.printStackTrace();
-            System.err.println(getSQL());
+            log.error(getSQL());
             throw new DataError(DataError.UNKNOWN_ERROR, "PSQLException");
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("SQLException", e);
             throw new DataError(DataError.UNKNOWN_ERROR, "SQLException");
         }
     }
@@ -83,7 +84,7 @@ public abstract class SQLStatement {
             }
         }
 
-        public static Map fromJSON(JSONObject data) {
+        static Map fromJSON(JSONObject data) {
             Map map = new Map();
             copy(data, map);
             return map;
@@ -97,7 +98,7 @@ public abstract class SQLStatement {
             try {
                 return Map.fromJSON((JSONObject) new JSONParser().parse(reader));
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("JSON reading error");
                 throw new DataError(DataError.UNKNOWN_ERROR, "JSON read");
             } catch (ParseException e) {
                 throw new DataError(DataError.MISSED_FIELD, "Wrong JSON");
@@ -105,7 +106,7 @@ public abstract class SQLStatement {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("IO", e);
                 }
             }
         }
@@ -118,13 +119,11 @@ public abstract class SQLStatement {
                     data.put(key, Double.valueOf(d));
                     continue;
                 } catch (NumberFormatException ignored) {
-
                 }
                 try {
                     data.put(key, Integer.valueOf(d));
                     continue;
                 } catch (NumberFormatException ignored) {
-
                 }
                 data.put(key, d);
             }
