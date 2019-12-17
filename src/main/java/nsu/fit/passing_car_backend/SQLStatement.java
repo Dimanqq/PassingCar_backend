@@ -1,7 +1,6 @@
 package nsu.fit.passing_car_backend;
 
 import io.undertow.server.HttpServerExchange;
-import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -16,9 +15,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class SQLStatement {
-    private static final Logger log = Logger.getLogger(SQLStatement.class);
+    private static final Logger logger = Logger.getLogger(SQLStatement.class.getName());
 
     protected abstract AssertMap getAssert();
 
@@ -59,10 +60,10 @@ public abstract class SQLStatement {
                     throw new DataError(DataError.DUPLICATE, constraint);
                 }
             }
-            log.error(getSQL());
+            logger.severe(getSQL());
             throw new DataError(DataError.UNKNOWN_ERROR, "PSQLException");
         } catch (SQLException e) {
-            log.error("SQLException", e);
+            logger.log(Level.SEVERE, "SQLException", e);
             throw new DataError(DataError.UNKNOWN_ERROR, "SQLException");
         }
     }
@@ -98,7 +99,7 @@ public abstract class SQLStatement {
             try {
                 return Map.fromJSON((JSONObject) new JSONParser().parse(reader));
             } catch (IOException e) {
-                log.error("JSON reading error");
+                logger.severe("JSON reading error");
                 throw new DataError(DataError.UNKNOWN_ERROR, "JSON read");
             } catch (ParseException e) {
                 throw new DataError(DataError.MISSED_FIELD, "Wrong JSON");
@@ -106,7 +107,7 @@ public abstract class SQLStatement {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    log.error("IO", e);
+                    logger.log(Level.SEVERE, "Cannot close", e);
                 }
             }
         }
