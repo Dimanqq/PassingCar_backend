@@ -22,58 +22,27 @@ public class RegistrationTest {
     }
 
     @Test
-    public void correctRequest() {
+    public String test() throws IOException, ParseException {
         URL url;
-        try {
-            url = new URL("http://localhost:8080/create/user");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setDoOutput(true);
-            con.setRequestMethod("POST");
-            JSONObject o = new JSONObject();
-            o.put("first_name", "Alina");
-            o.put("last_name", "Matveeva");
-            o.put("phone", "77777777777");
-            o.put("password", "1111111");
-            o.put("email", "alina@yandex.ru");
-            OutputStream out = con.getOutputStream();
-            out.write(o.toString().getBytes(StandardCharsets.UTF_8));
-            InputStream stream = con.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-            JSONParser p = new JSONParser();
-            JSONObject res = (JSONObject) p.parse(br);
-            assertNotNull(res.get("user_id"));
-            assertEquals(201, con.getResponseCode());
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void secondUser() {
-        URL url;
-        try {
-            url = new URL("http://localhost:8080/create/user");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setDoOutput(true);
-            con.setRequestMethod("POST");
-            JSONObject o = new JSONObject();
-            o.put("first_name", "Aya");
-            o.put("last_name", "Matveeva");
-            o.put("phone", "77999777");
-            o.put("password", "1111111");
-            o.put("email", "aya@yandex.ru");
-            OutputStream out = con.getOutputStream();
-            out.write(o.toString().getBytes(StandardCharsets.UTF_8));
-            InputStream stream = con.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-            JSONParser p = new JSONParser();
-            JSONObject res = (JSONObject) p.parse(br);
-            assertNotNull(res.get("user_id"));
-            System.out.println(res.get("user_id"));
-            assertEquals(201, con.getResponseCode());
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
+        url = new URL("http://localhost:8080/create/user");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setDoOutput(true);
+        con.setRequestMethod("POST");
+        JSONObject o = new JSONObject();
+        o.put("first_name", "Aya" + Math.random());
+        o.put("last_name", "Matveeva" + Math.random());
+        o.put("phone", "77999777" + Math.random());
+        o.put("password", "1111111" + Math.random());
+        o.put("email", "aya@yandex.ru" + Math.random());
+        OutputStream out = con.getOutputStream();
+        out.write(o.toString().getBytes(StandardCharsets.UTF_8));
+        InputStream stream = con.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        JSONParser p = new JSONParser();
+        JSONObject res = (JSONObject) p.parse(br);
+        assertNotNull(res.get("user_id"));
+        assertEquals(201, con.getResponseCode());
+        return (String) res.get("user_id");
     }
 
 }

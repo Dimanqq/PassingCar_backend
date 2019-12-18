@@ -23,21 +23,19 @@ public class InviteRideTest {
     }
 
     @Test
-    public void test() {
+    public void test() throws IOException, ParseException {
         URL url;
-        try {
-            url = new URL("http://localhost:8080/rides/000/invite");//todo
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Authorization", "b9555212-2193-11ea-9ee8-0242ac110002");
-            InputStream stream = con.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-            System.out.println(br.readLine());
-            JSONParser parser = new JSONParser();
-            JSONObject res = (JSONObject) parser.parse(br);
-            assertEquals(201, con.getResponseCode()); // todo
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
+        String user_id = new RegistrationTest().test();
+        String ride_id = new CreateRideTest().createRide(user_id);
+        url = new URL("http://localhost:8080/rides/" + ride_id + "/invite");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Authorization", user_id);
+        InputStream stream = con.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+        System.out.println(br.readLine());
+        JSONParser parser = new JSONParser();
+        JSONObject res = (JSONObject) parser.parse(br);
+        assertEquals(201, con.getResponseCode());
     }
 }

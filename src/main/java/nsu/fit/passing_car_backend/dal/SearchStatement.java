@@ -22,19 +22,31 @@ public class SearchStatement extends SQLStatement {
 
     @Override
     protected String getSQL() {
-        return "SELECT ride.id, point.lat, point.lon " +
+        return "SELECT ride.id, point_start.lat, point_start.lon, ride.time_start " +
                 "FROM ride " +
-                "JOIN point ON point.id = ride.point_start " +
-                "JOIN (SELECT ? AS lat, ? AS lon, ? AS radius, 3 AS b) AS q ON q.b = 3 " +
-                "WHERE ABS(point.lat - q.lat) / 180 * PI() * 6371 * 1000 < q.radius " +
-                "AND ABS(point.lon - q.lon) / 180 * PI() * 6371 * 1000 < q.radius";
+                "JOIN point AS point_start ON point_start.id = ride.point_start " +
+                "JOIN point AS point_end ON point_end.id = ride.point_end " +
+                "JOIN (SELECT " +
+                "? AS lat_start, " +
+                "? AS lon_start, " +
+                "? AS radius, " +
+                "3 AS b, " +
+                "? AS lat_end, " +
+                "? AS lon_end " +
+                ") AS q ON q.b = 3 " +
+                "WHERE ABS(point_start.lat - q.lat_start) / 180 * PI() * 6371 * 1000 < q.radius " +
+                "AND ABS(point_start.lon - q.lon_start) / 180 * PI() * 6371 * 1000 < q.radius " +
+                "AND ABS(point_end.lat - q.lat_end) / 180 * PI() * 6371 * 1000 < q.radius " +
+                "AND ABS(point_end.lon - q.lon_end) / 180 * PI() * 6371 * 1000 < q.radius ";
     }
 
     @Override
     protected Map run(PreparedStatement statement, Map data) throws SQLException {
-        statement.setDouble(1, (Double) data.get("lat"));
-        statement.setDouble(2, (Double) data.get("lon"));
-        statement.setDouble(3, RADIUS);
+        statement.setDouble(1, (Double) data.get("lat_start"));
+        statement.setDouble(2, (Double) data.get("lon_start"));
+        statement.setDouble(4, (Double) data.get("lat_end"));
+        statement.setDouble(5, (Double) data.get("lon_end"));
+        statement.setDouble(3, (Double) data.get("radius"));
         try (ResultSet res = statement.executeQuery()) {
             List<Map> lst = new ArrayList<>();
             while (res.next()) {
@@ -42,6 +54,7 @@ public class SearchStatement extends SQLStatement {
                 e.put("ride_id", res.getString(1));
                 e.put("lat_start", res.getDouble(2));
                 e.put("lon_start", res.getDouble(3));
+                e.put("time_start", res.getString(4));
                 lst.add(e);
             }
             return Map.oneValue("rides", lst);
