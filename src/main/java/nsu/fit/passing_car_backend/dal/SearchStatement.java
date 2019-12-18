@@ -32,12 +32,16 @@ public class SearchStatement extends SQLStatement {
                 "? AS radius, " +
                 "3 AS b, " +
                 "? AS lat_end, " +
-                "? AS lon_end " +
+                "? AS lon_end, " +
+                "?::timestamptz AS time_needed, " +
+                "?::interval AS time_delta" +
                 ") AS q ON q.b = 3 " +
-                "WHERE ABS(point_start.lat - q.lat_start) / 180 * PI() * 6371 * 1000 < q.radius " +
+                "WHERE " +
+                "ABS(point_start.lat - q.lat_start) / 180 * PI() * 6371 * 1000 < q.radius " +
                 "AND ABS(point_start.lon - q.lon_start) / 180 * PI() * 6371 * 1000 < q.radius " +
                 "AND ABS(point_end.lat - q.lat_end) / 180 * PI() * 6371 * 1000 < q.radius " +
-                "AND ABS(point_end.lon - q.lon_end) / 180 * PI() * 6371 * 1000 < q.radius ";
+                "AND ABS(point_end.lon - q.lon_end) / 180 * PI() * 6371 * 1000 < q.radius " +
+                "AND r.time_start < q.time_needed + q.time_delta AND r.time_start > q.time_needed - q.time_delta";
     }
 
     @Override
@@ -47,6 +51,9 @@ public class SearchStatement extends SQLStatement {
         statement.setDouble(4, (Double) data.get("lat_end"));
         statement.setDouble(5, (Double) data.get("lon_end"));
         statement.setDouble(3, (Double) data.get("radius"));
+
+        statement.setString(6, (String) data.get("time_needed"));
+        statement.setString(7, String.valueOf(data.get("time_delta")) + " hour");
         try (ResultSet res = statement.executeQuery()) {
             List<Map> lst = new ArrayList<>();
             while (res.next()) {

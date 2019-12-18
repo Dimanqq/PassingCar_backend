@@ -23,7 +23,7 @@ public class CreateRideTest {
 
     @Test
     public void test() throws IOException, ParseException {
-        createRide(new RegistrationTest().test());
+        createRide(new RegistrationTest().registrateUser());
     }
 
     public String createRide(String user_id) throws IOException, ParseException {

@@ -22,7 +22,11 @@ public class RegistrationTest {
     }
 
     @Test
-    public String test() throws IOException, ParseException {
+    public void test() throws IOException, ParseException {
+        registrateUser();
+    }
+
+    public String registrateUser() throws IOException, ParseException {
         URL url;
         url = new URL("http://localhost:8080/create/user");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -44,5 +48,4 @@ public class RegistrationTest {
         assertEquals(201, con.getResponseCode());
         return (String) res.get("user_id");
     }
-
 }

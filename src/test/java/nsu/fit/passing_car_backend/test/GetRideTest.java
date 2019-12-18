@@ -26,7 +26,10 @@ public class GetRideTest {
     public void test() {
         URL url;
         try {
-            url = new URL("http://localhost:8080/rides/id");//todo
+            RegistrationTest t = new RegistrationTest();
+            t.test();
+            String ride_id = new CreateRideTest().createRide(t.userId);
+            url = new URL("http://localhost:8080/rides/" + ride_id);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("Authorization", "b9555212-2193-11ea-9ee8-0242ac110002"); // aya uuid
