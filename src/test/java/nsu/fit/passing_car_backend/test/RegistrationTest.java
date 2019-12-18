@@ -11,14 +11,13 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class RegistrationTest {
     @BeforeClass
-    public static void init(){
+    public static void init() {
         Initializer.init();
     }
 
@@ -31,11 +30,11 @@ public class RegistrationTest {
             con.setDoOutput(true);
             con.setRequestMethod("POST");
             JSONObject o = new JSONObject();
-            o.put("first_name", "Kirill");
-            o.put("last_name", "Matveev");
+            o.put("first_name", "Alina");
+            o.put("last_name", "Matveeva");
+            o.put("phone", "77777777777");
             o.put("password", "1111111");
-            o.put("phone", String.valueOf(new Random().nextInt()));
-            o.put("email", String.valueOf(new Random().nextInt()));
+            o.put("email", "alina@yandex.ru");
             OutputStream out = con.getOutputStream();
             out.write(o.toString().getBytes(StandardCharsets.UTF_8));
             InputStream stream = con.getInputStream();
