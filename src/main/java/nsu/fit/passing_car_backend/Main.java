@@ -60,7 +60,12 @@ public class Main {
                         serverUtils,
                         new BlockingHandler(new DeleteInviteHandler(serverUtils))
                 ))
-                .get("/res", new BlockingHandler(new ResourcesHandler()));
+                .get("/res", new BlockingHandler(new ResourcesHandler()
+                ))
+                .get("rides/creator/{id}", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new GetRidesCreatorHandler(serverUtils))
+                ));
 
         Undertow server = Undertow.builder().addHttpListener(8080,
                 "0.0.0.0").setHandler(mainHandler).build();

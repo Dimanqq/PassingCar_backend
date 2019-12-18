@@ -11,6 +11,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 
+import static org.junit.Assert.assertTrue;
+
 public class ResourcesTest {
     @BeforeClass
     public static void init() {
@@ -26,6 +28,6 @@ public class ResourcesTest {
         InputStream i = c.getInputStream();
         i.transferTo(o);
         i.close();
-        assert o.toString(String.valueOf(Charset.defaultCharset())).contains("<!-- For tests -->");
+        assertTrue(o.toString(String.valueOf(Charset.defaultCharset())).contains("<!-- For tests -->"));
     }
 }
