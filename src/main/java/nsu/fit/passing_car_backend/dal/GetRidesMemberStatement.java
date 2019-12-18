@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class GetRidesCreatorStatement extends SQLStatement {
+public class GetRidesMemberStatement extends SQLStatement {
     @Override
     protected SQLStatement.AssertMap getAssert() {
         SQLStatement.AssertMap map = new SQLStatement.AssertMap();
