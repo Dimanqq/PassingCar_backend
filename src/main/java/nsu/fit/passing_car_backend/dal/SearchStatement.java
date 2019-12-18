@@ -9,20 +9,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchStatement extends SQLStatement {
-    private static final double RADIUS = 10; // meters
-
     @Override
     protected AssertMap getAssert() {
         AssertMap map = new AssertMap();
-        map.put("user_id", String.class);
-        map.put("lat", Double.class);
-        map.put("lon", Double.class);
+        map.put("ride_id", String.class);
+        map.put("time_start", String.class);
+        map.put("lat_start", Double.class);
+        map.put("lon_start", Double.class);
+        map.put("lat_end", Double.class);
+        map.put("lon_end", Double.class);
+        map.put("radius", Double.class);
+        map.put("time_needed", Double.class);
         return map;
     }
 
     @Override
     protected String getSQL() {
-        return "SELECT ride.id, point_start.lat, point_start.lon, ride.time_start " +
+        return "SELECT ride.id, point_start.lat, point_start.lon, ride.time_start, " +
+                "extract(epoch from current_timestamp - ride.time_start) / 3600,  " +
+                "point_end.lat, point_end.lon " +
                 "FROM ride " +
                 "JOIN point AS point_start ON point_start.id = ride.point_start " +
                 "JOIN point AS point_end ON point_end.id = ride.point_end " +
@@ -62,6 +67,9 @@ public class SearchStatement extends SQLStatement {
                 e.put("lat_start", res.getDouble(2));
                 e.put("lon_start", res.getDouble(3));
                 e.put("time_start", res.getString(4));
+                e.put("time_to_departure", res.getDouble(5));
+                e.put("lat_end", res.getDouble(6));
+                e.put("lon_end", res.getDouble(7));
                 lst.add(e);
             }
             return Map.oneValue("rides", lst);

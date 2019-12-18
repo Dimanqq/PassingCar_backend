@@ -19,6 +19,10 @@ public class InviteRideTest {
 
     @Test
     public void test() throws IOException, ParseException {
+        invite();
+    }
+
+    private String invite() throws IOException, ParseException {
         URL url;
         String ride_id, user_id;
         user_id = new RegistrationTest().registrateUser();
@@ -28,5 +32,20 @@ public class InviteRideTest {
         con.setRequestMethod("POST");
         con.setRequestProperty("Authorization", user_id);
         assertEquals(201, con.getResponseCode());
+        return ride_id;
+    }
+
+    String inviteUser(String user_id) throws IOException, ParseException {
+        URL url;
+        String ride_id;
+        String creator_id;
+        creator_id = new RegistrationTest().registrateUser();
+        ride_id = new CreateRideTest().createRide(creator_id);
+        url = new URL("http://localhost:8080/rides/" + ride_id + "/invite");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Authorization", user_id);
+        assertEquals(201, con.getResponseCode());
+        return ride_id;
     }
 }
