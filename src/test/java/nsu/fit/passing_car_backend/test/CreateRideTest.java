@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class RegistrationTest {
+public class CreateRideTest {
     @BeforeClass
     public static void init() {
         Initializer.init();
@@ -23,29 +23,37 @@ public class RegistrationTest {
 
     @Test
     public void test() throws IOException, ParseException {
-        registrateUser();
+        createRide(new RegistrationTest().registrateUser());
     }
 
-    public String registrateUser() throws IOException, ParseException {
+    public String createRide(String user_id) throws IOException, ParseException {
         URL url;
-        url = new URL("http://localhost:8080/create/user");
+        url = new URL("http://localhost:8080/create/ride");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setDoOutput(true);
         con.setRequestMethod("POST");
+        con.setRequestProperty("Authorization", user_id);
         JSONObject o = new JSONObject();
-        o.put("first_name", "Aya" + Math.random());
-        o.put("last_name", "Matveeva" + Math.random());
-        o.put("phone", "77999777" + Math.random());
-        o.put("password", "1111111" + Math.random());
-        o.put("email", "aya@yandex.ru" + Math.random());
+        o.put("lat_start", 4332224.43);
+        o.put("lat_end", 400224.43);
+        o.put("lon_start", 3298922.29);
+        o.put("lon_end", 3200922.29);
+        o.put("time_start", "2019-12-18T13:18:44.599Z");
+        o.put("places_count", 3);
         OutputStream out = con.getOutputStream();
         out.write(o.toString().getBytes(StandardCharsets.UTF_8));
-        InputStream stream = con.getInputStream();
+        out.flush();
+        InputStream stream;
+        try {
+            stream = con.getInputStream();
+        } catch (IOException e) {
+            stream = con.getErrorStream();
+        }
         BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-        JSONParser p = new JSONParser();
-        JSONObject res = (JSONObject) p.parse(br);
-        assertNotNull(res.get("user_id"));
+        JSONParser parser = new JSONParser();
+        JSONObject res = (JSONObject) parser.parse(br);
+        assertNotNull(res.get("ride_id"));
         assertEquals(201, con.getResponseCode());
-        return (String) res.get("user_id");
+        return (String) res.get("ride_id");
     }
 }
