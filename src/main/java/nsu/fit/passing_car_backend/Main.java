@@ -60,6 +60,14 @@ public class Main {
                         serverUtils,
                         new BlockingHandler(new DeleteInviteHandler(serverUtils))
                 ))
+                .delete("/rides/{id}", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new DeleteRideHandler(serverUtils))
+                ))
+                .delete("/rides/{ride_id}/{user_id}", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new DeleteUserRideHandler(serverUtils))
+                ))
                 .get("/res", new BlockingHandler(new ResourcesHandler()
                 ))
                 .get("/rides/creator/{id}", new AuthorizationHandler(

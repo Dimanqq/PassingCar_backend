@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class GetMembersRideTest {
+
     @BeforeClass
     public static void init() {
         Initializer.init();
@@ -26,13 +27,26 @@ public class GetMembersRideTest {
 
     @Test
     public void test() throws IOException, ParseException {
-        URL url;
         String creatorId = new RegistrationTest().registrateUser();
         String rideId = new CreateRideTest().createRide(creatorId);
         String id1, id2, id3;
         id1 = new InviteRideTest().inviteRide(rideId);
         id2 = new InviteRideTest().inviteRide(rideId);
         id3 = new InviteRideTest().inviteRide(rideId);
+
+        JSONArray list = getMembers(rideId, creatorId);
+        for (Object it : list
+        ) {
+            JSONObject o = (JSONObject) it;
+            assertTrue(o.get("id").equals(id1)
+                    || o.get("id").equals(id2)
+                    || o.get("id").equals(id3));
+        }
+
+    }
+
+    public JSONArray getMembers(String rideId, String creatorId) throws IOException, ParseException {
+        URL url;
         url = new URL("http://localhost:8080/users/member/" + rideId);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
@@ -48,14 +62,8 @@ public class GetMembersRideTest {
         JSONParser parser = new JSONParser();
         JSONObject res = (JSONObject) parser.parse(br);
         JSONArray list = (JSONArray) res.get("users");
-        for (Object it : list
-        ) {
-            JSONObject o = (JSONObject) it;
-            assertTrue(o.get("id").equals(id1)
-                    || o.get("id").equals(id2)
-                    || o.get("id").equals(id3));
-        }
         stream.close();
         con.disconnect();
+        return list;
     }
 }
