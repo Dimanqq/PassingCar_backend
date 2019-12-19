@@ -1,11 +1,22 @@
 package nsu.fit.passing_car_backend.test;
 
 import nsu.fit.passing_car_backend.Initializer;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GetRidesMemberTest {
     @BeforeClass
@@ -15,7 +26,7 @@ public class GetRidesMemberTest {
 
     @Test
     public void test() throws IOException, ParseException {
-        /*URL url;
+        URL url;
         String memberId = new RegistrationTest().registrateUser();
         String id1, id2, id3;
         id1 = new InviteRideTest().inviteUser(memberId);
@@ -36,11 +47,12 @@ public class GetRidesMemberTest {
         JSONParser parser = new JSONParser();
         JSONObject res = (JSONObject) parser.parse(br);
         JSONArray list = (JSONArray) res.get("rides");
-
-        *//*for (Object it : list
+        for (Object it : list
         ) {
             JSONObject o = (JSONObject) it;
-            assertEquals(creatorId, o.get("creator_id"));
-        }*/
+            assertTrue(o.get("ride_id").equals(id1)
+                    || o.get("ride_id").equals(id2)
+                    || o.get("ride_id").equals(id3));
+        }
     }
 }
