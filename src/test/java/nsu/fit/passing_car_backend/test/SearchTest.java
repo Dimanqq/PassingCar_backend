@@ -10,6 +10,9 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class SearchTest {
     @BeforeClass
@@ -36,7 +39,13 @@ public class SearchTest {
         con.setRequestProperty("Authorization", user_id);
         con.setRequestMethod("GET");
         JSONObject o2 = Helpers.getJSON(con);
-        System.out.println(o1.toString());
-        System.out.println(o2.toString());
+        int cnt = 0;
+        for (JSONObject ride : (List<JSONObject>) o2.get("rides")) {
+            if (ride_id.equals(ride.get("ride_id"))) {
+                cnt++;
+            }
+        }
+        assertEquals(cnt, 1);
+        // TODO: assert another fields
     }
 }
