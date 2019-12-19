@@ -54,6 +54,8 @@ public class CreateRideTest {
         JSONObject res = (JSONObject) parser.parse(br);
         assertNotNull(res.get("ride_id"));
         assertEquals(201, con.getResponseCode());
+        stream.close();
+        con.disconnect();
         return (String) res.get("ride_id");
     }
 }

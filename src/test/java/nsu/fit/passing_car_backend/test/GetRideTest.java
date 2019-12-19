@@ -29,9 +29,7 @@ public class GetRideTest {
     }
 
     public JSONObject getRide(String user_id, String ride_id) throws IOException, ParseException {
-        URL url;
-
-        url = new URL("http://localhost:8080/rides/" + ride_id);
+        URL url = new URL("http://localhost:8080/rides/" + ride_id);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("Authorization", user_id);
@@ -40,6 +38,7 @@ public class GetRideTest {
         ByteArrayOutputStream o = new ByteArrayOutputStream();
         i.transferTo(o);
         i.close();
+        con.disconnect();
         return (JSONObject) new JSONParser().parse(o.toString("UTF-8"));
     }
 }

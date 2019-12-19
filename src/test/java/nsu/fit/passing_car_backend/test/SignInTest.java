@@ -61,6 +61,8 @@ public class SignInTest {
             JSONParser parser = new JSONParser();
             JSONObject res = (JSONObject) parser.parse(br);
             assertNotNull(res.get("user_id"));
+            stream.close();
+            con.disconnect();
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }

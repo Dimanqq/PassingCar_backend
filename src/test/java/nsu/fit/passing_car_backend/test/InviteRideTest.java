@@ -32,6 +32,7 @@ public class InviteRideTest {
         con.setRequestMethod("POST");
         con.setRequestProperty("Authorization", user_id);
         assertEquals(201, con.getResponseCode());
+        con.disconnect();
         return ride_id;
     }
 
@@ -46,6 +47,7 @@ public class InviteRideTest {
         con.setRequestMethod("POST");
         con.setRequestProperty("Authorization", user_id);
         assertEquals(201, con.getResponseCode());
+        con.disconnect();
         return ride_id;
     }
 }

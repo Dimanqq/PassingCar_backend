@@ -46,6 +46,8 @@ public class RegistrationTest {
         JSONObject res = (JSONObject) p.parse(br);
         assertNotNull(res.get("user_id"));
         assertEquals(201, con.getResponseCode());
+        stream.close();
+        con.disconnect();
         return (String) res.get("user_id");
     }
 }

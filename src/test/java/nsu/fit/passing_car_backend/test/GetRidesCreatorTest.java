@@ -51,6 +51,8 @@ public class GetRidesCreatorTest {
             JSONObject o = (JSONObject) it;
             assertEquals(creatorId, o.get("creator_id"));
         }
+        stream.close();
+        con.disconnect();
     }
 
 }
