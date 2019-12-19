@@ -34,10 +34,9 @@ public class Helpers {
             is = con.getInputStream();
         } catch (IOException e) {
             is = con.getErrorStream();
-        }
-        if (is == null) {
-            System.out.println(con);
-            throw new IOException("sdf");
+            if (is == null) {
+                throw new IOException("No JSON and any data in connection", e);
+            }
         }
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         is.transferTo(os);
