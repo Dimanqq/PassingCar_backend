@@ -27,11 +27,12 @@ public class GetRidesMemberStatement extends SQLStatement {
                 "point_start.lat, " +
                 "point_start.lon, " +
                 "point_end.lat, " +
-                "point_end.lon " +
+                "point_end.lon, " +
+                "m2m_ride_user.user_id::text " +
                 "FROM m2m_ride_user " +
-                "JOIN (SELECT ride.time_start, ride.places_count, ride.creator_id, ride.id FROM ride) AS r ON m2m_ride_user.ride_id = r.id " +
-                "JOIN (SELECT point.lat, point.lon, point.id FROM point) AS point_start ON point_start.id = ride.point_start " +
-                "JOIN (SELECT point.lat, point.lon, point.id FROM point) AS point_end ON point_end.id = ride.point_end " +
+                "JOIN (SELECT ride.time_start, ride.places_count, ride.creator_id, ride.id, ride.point_start, ride.point_end FROM ride) AS r ON m2m_ride_user.ride_id = r.id " +
+                "JOIN (SELECT point.lat, point.lon, point.id FROM point) AS point_start ON point_start.id = r.point_start " +
+                "JOIN (SELECT point.lat, point.lon, point.id FROM point) AS point_end ON point_end.id = r.point_end " +
                 "WHERE m2m_ride_user.user_id = ?::uuid";
     }
 
