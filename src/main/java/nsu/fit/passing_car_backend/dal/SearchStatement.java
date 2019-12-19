@@ -26,7 +26,7 @@ public class SearchStatement extends SQLStatement {
 
     @Override
     protected String getSQL() {
-        return "SELECT r.id, point_start.lat, point_start.lon, r.time_start,\n" +
+        return "SELECT r.id, point_start.lat, point_start.lon, to_json(r.time_start)#>>'{}',\n" +
                 "extract(epoch from current_timestamp - r.time_start) / 3600,\n" +
                 "point_end.lat, point_end.lon\n" +
                 "FROM ride AS r\n" +

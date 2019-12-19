@@ -19,7 +19,7 @@ public class GetRideStatement extends SQLStatement {
     @Override
     protected String getSQL() {
         return "SELECT " +
-                "ride.time_start, " +
+                "to_json(ride.time_start)#>>'{}', " +
                 "ride.places_count, " +
                 "ride.creator_id::text  , " +
                 "point_start.lat, " +
