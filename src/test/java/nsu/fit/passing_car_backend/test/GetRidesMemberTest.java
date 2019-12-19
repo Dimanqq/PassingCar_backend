@@ -54,5 +54,7 @@ public class GetRidesMemberTest {
                     || o.get("ride_id").equals(id2)
                     || o.get("ride_id").equals(id3));
         }
+        stream.close();
+        con.disconnect();
     }
 }

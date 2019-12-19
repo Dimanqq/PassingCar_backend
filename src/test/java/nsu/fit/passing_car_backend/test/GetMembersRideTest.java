@@ -16,8 +16,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class GetRidesCreatorTest {
+public class GetMembersRideTest {
     @BeforeClass
     public static void init() {
         Initializer.init();
@@ -27,11 +28,12 @@ public class GetRidesCreatorTest {
     public void test() throws IOException, ParseException {
         URL url;
         String creatorId = new RegistrationTest().registrateUser();
-        new CreateRideTest().createRide(creatorId);
-        new CreateRideTest().createRide(creatorId);
-        new CreateRideTest().createRide(creatorId);
-        new CreateRideTest().createRide(creatorId);
-        url = new URL("http://localhost:8080/rides/creator/" + creatorId);
+        String rideId = new CreateRideTest().createRide(creatorId);
+        String id1, id2, id3;
+        id1 = new InviteRideTest().inviteRide(rideId);
+        id2 = new InviteRideTest().inviteRide(rideId);
+        id3 = new InviteRideTest().inviteRide(rideId);
+        url = new URL("http://localhost:8080/users/member/" + rideId);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("Authorization", creatorId);
@@ -45,14 +47,15 @@ public class GetRidesCreatorTest {
         assertEquals(200, con.getResponseCode());
         JSONParser parser = new JSONParser();
         JSONObject res = (JSONObject) parser.parse(br);
-        JSONArray list = (JSONArray) res.get("rides");
+        JSONArray list = (JSONArray) res.get("users");
         for (Object it : list
         ) {
             JSONObject o = (JSONObject) it;
-            assertEquals(creatorId, o.get("creator_id"));
+            assertTrue(o.get("id").equals(id1)
+                    || o.get("id").equals(id2)
+                    || o.get("id").equals(id3));
         }
         stream.close();
         con.disconnect();
     }
-
 }

@@ -12,14 +12,14 @@ public class SearchStatement extends SQLStatement {
     @Override
     protected AssertMap getAssert() {
         AssertMap map = new AssertMap();
-        map.put("ride_id", String.class);
-        map.put("time_start", String.class);
         map.put("lat_start", Double.class);
         map.put("lon_start", Double.class);
         map.put("lat_end", Double.class);
         map.put("lon_end", Double.class);
-        map.put("radius", Double.class);
+        map.put("radius_start", Double.class);
+        map.put("radius_end", Double.class);
         map.put("time_needed", Double.class);
+        map.put("time_delta", Double.class);
         return map;
     }
 
@@ -34,7 +34,8 @@ public class SearchStatement extends SQLStatement {
                 "JOIN (SELECT " +
                 "? AS lat_start, " +
                 "? AS lon_start, " +
-                "? AS radius, " +
+                "? AS radius_start, " +
+                "? AS radius_end, " +
                 "3 AS b, " +
                 "? AS lat_end, " +
                 "? AS lon_end, " +
@@ -42,20 +43,23 @@ public class SearchStatement extends SQLStatement {
                 "?::interval AS time_delta" +
                 ") AS q ON q.b = 3 " +
                 "WHERE " +
-                "ABS(point_start.lat - q.lat_start) / 180 * PI() * 6371 * 1000 < q.radius " +
-                "AND ABS(point_start.lon - q.lon_start) / 180 * PI() * 6371 * 1000 < q.radius " +
-                "AND ABS(point_end.lat - q.lat_end) / 180 * PI() * 6371 * 1000 < q.radius " +
-                "AND ABS(point_end.lon - q.lon_end) / 180 * PI() * 6371 * 1000 < q.radius " +
+                "ABS(point_start.lat - q.lat_start) / 180 * PI() * 6371 * 1000 < q.radius_start " +
+                "AND ABS(point_start.lon - q.lon_start) / 180 * PI() * 6371 * 1000 < q.radius_start " +
+                "AND ABS(point_end.lat - q.lat_end) / 180 * PI() * 6371 * 1000 < q.radius_end " +
+                "AND ABS(point_end.lon - q.lon_end) / 180 * PI() * 6371 * 1000 < q.radius_end " +
                 "AND r.time_start < q.time_needed + q.time_delta AND r.time_start > q.time_needed - q.time_delta";
     }
 
     @Override
     protected Map run(PreparedStatement statement, Map data) throws SQLException {
+        System.out.println(data.toString());
         statement.setDouble(1, (Double) data.get("lat_start"));
         statement.setDouble(2, (Double) data.get("lon_start"));
-        statement.setDouble(4, (Double) data.get("lat_end"));
-        statement.setDouble(5, (Double) data.get("lon_end"));
-        statement.setDouble(3, (Double) data.get("radius"));
+        statement.setDouble(3, (Double) data.get("radius_start"));
+        statement.setDouble(4, (Double) data.get("radius_end"));
+        statement.setDouble(5, (Double) data.get("lat_end"));
+        statement.setDouble(6, (Double) data.get("lon_end"));
+
 
         statement.setString(6, (String) data.get("time_needed"));
         statement.setString(7, String.valueOf(data.get("time_delta")) + " hour");

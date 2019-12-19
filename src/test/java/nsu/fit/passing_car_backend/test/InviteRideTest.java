@@ -32,6 +32,7 @@ public class InviteRideTest {
         con.setRequestMethod("POST");
         con.setRequestProperty("Authorization", user_id);
         assertEquals(201, con.getResponseCode());
+        con.disconnect();
         return ride_id;
     }
 
@@ -46,6 +47,19 @@ public class InviteRideTest {
         con.setRequestMethod("POST");
         con.setRequestProperty("Authorization", user_id);
         assertEquals(201, con.getResponseCode());
+        con.disconnect();
         return ride_id;
+    }
+
+    String inviteRide(String ride_id) throws IOException, ParseException {
+        URL url;
+        String member_id = new RegistrationTest().registrateUser();
+        url = new URL("http://localhost:8080/rides/" + ride_id + "/invite");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Authorization", member_id);
+        assertEquals(201, con.getResponseCode());
+        con.disconnect();
+        return member_id;
     }
 }

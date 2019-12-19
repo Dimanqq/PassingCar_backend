@@ -69,6 +69,10 @@ public class Main {
                 .get("/rides/member/{id}", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new GetRidesMemberHandler(serverUtils))
+                ))
+                .get("/users/member/{id}", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new GetMembersRideHandler(serverUtils))
                 ));
 
         Undertow server = Undertow.builder().addHttpListener(8080,

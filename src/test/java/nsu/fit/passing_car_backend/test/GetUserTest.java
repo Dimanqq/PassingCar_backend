@@ -26,5 +26,6 @@ public class GetUserTest {
         con.setRequestMethod("GET");
         con.setRequestProperty("Authorization", user_id);
         assertEquals(200, con.getResponseCode());
+        con.disconnect();
     }
 }
