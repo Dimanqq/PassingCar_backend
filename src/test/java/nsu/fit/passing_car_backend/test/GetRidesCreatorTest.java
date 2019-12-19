@@ -25,12 +25,16 @@ public class GetRidesCreatorTest {
 
     @Test
     public void test() throws IOException, ParseException {
-        URL url;
         String creatorId = new RegistrationTest().registrateUser();
         new CreateRideTest().createRide(creatorId);
         new CreateRideTest().createRide(creatorId);
         new CreateRideTest().createRide(creatorId);
         new CreateRideTest().createRide(creatorId);
+        getRidesCreator(creatorId);
+    }
+
+    public JSONArray getRidesCreator(String creatorId) throws IOException, ParseException {
+        URL url;
         url = new URL("http://localhost:8080/rides/creator/" + creatorId);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
@@ -53,6 +57,7 @@ public class GetRidesCreatorTest {
         }
         stream.close();
         con.disconnect();
+        return list;
     }
 
 }

@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main {
-    static final private Logger logger = Logger.getLogger(Main.class.getName());
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
         final ServerUtils serverUtils;
@@ -59,6 +59,14 @@ public class Main {
                 .delete("/rides/{id}/invite", new AuthorizationHandler(
                         serverUtils,
                         new BlockingHandler(new DeleteInviteHandler(serverUtils))
+                ))
+                .delete("/rides/{id}", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new DeleteRideHandler(serverUtils))
+                ))
+                .delete("/rides/{ride_id}/{user_id}", new AuthorizationHandler(
+                        serverUtils,
+                        new BlockingHandler(new DeleteUserRideHandler(serverUtils))
                 ))
                 .get("/res", new BlockingHandler(new ResourcesHandler()
                 ))
