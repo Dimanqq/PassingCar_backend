@@ -2,10 +2,10 @@ package nsu.fit.passing_car_backend.handlers;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
-import nsu.fit.passing_car_backend.dal.SearchStatement;
 import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.SQLStatement;
 import nsu.fit.passing_car_backend.ServerUtils;
+import nsu.fit.passing_car_backend.dal.SearchStatement;
 
 public class SearchHandler implements HttpHandler {
     private ServerUtils serverUtils;
