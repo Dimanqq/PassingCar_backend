@@ -5,6 +5,7 @@ public class Initializer {
     public static synchronized void init(){
         if(!isInit){
             isInit = true;
+            Main.isTest = true;
             Main.main(new String[]{});
         }
     }
