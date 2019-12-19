@@ -21,7 +21,7 @@ public class SearchTest {
     public void test() throws IOException, ParseException {
         String user_id = new RegistrationTest().registrateUser();
         String ride_id = new CreateRideTest().createRide(user_id);
-        JSONObject o1 = new GetRideTest().getRide(user_id, ride_id);
+        JSONObject o1 = new CreateRideTest().getRide(user_id, ride_id);
         JSONObject data = new JSONObject();
         data.put("lat_start", o1.get("lat_start"));
         data.put("lon_start", o1.get("lon_start"));

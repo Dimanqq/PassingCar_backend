@@ -4,12 +4,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class Helpers {
     private static String enc(String s) throws UnsupportedEncodingException {
@@ -43,6 +41,13 @@ public class Helpers {
         }
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         is.transferTo(os);
+        is.close();
         return (JSONObject) new JSONParser().parse(os.toString("UTF-8"));
+    }
+
+    public static void putJSON(HttpURLConnection con, JSONObject o) throws IOException {
+        OutputStream os = con.getOutputStream();
+        os.write(o.toString().getBytes(StandardCharsets.UTF_8));
+        os.flush();
     }
 }
