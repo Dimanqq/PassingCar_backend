@@ -16,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GetRidesMemberTest {
     @BeforeClass
@@ -29,8 +30,8 @@ public class GetRidesMemberTest {
         String memberId = new RegistrationTest().registrateUser();
         String id1, id2, id3;
         id1 = new InviteRideTest().inviteUser(memberId);
-        //id2 = new InviteRideTest().inviteUser(memberId);
-        //id3 = new InviteRideTest().inviteUser(memberId);
+        id2 = new InviteRideTest().inviteUser(memberId);
+        id3 = new InviteRideTest().inviteUser(memberId);
         url = new URL("http://localhost:8080/rides/member/" + memberId);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
@@ -49,7 +50,9 @@ public class GetRidesMemberTest {
         for (Object it : list
         ) {
             JSONObject o = (JSONObject) it;
-            assertEquals(id1, o.get("ride_id"));
+            assertTrue(o.get("ride_id").equals(id1)
+                    || o.get("ride_id").equals(id2)
+                    || o.get("ride_id").equals(id3));
         }
     }
 }
