@@ -5,7 +5,7 @@ import nsu.fit.passing_car_backend.SQLStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class DeleteRideStatement extends SQLStatement {
+public class DeleteRideM2MStatement extends SQLStatement {
     @Override
     protected AssertMap getAssert() {
         AssertMap map = new AssertMap();
@@ -16,8 +16,9 @@ public class DeleteRideStatement extends SQLStatement {
 
     @Override
     protected String getSQL() {
-        return "DELETE FROM ride " +
-                "WHERE ride.id = ?::uuid";
+        return "DELETE FROM m2m_ride_user " +
+                "WHERE m2m_ride_user.ride_id = ?::uuid "
+                ;
     }
 
     @Override
