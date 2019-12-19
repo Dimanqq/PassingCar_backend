@@ -61,6 +61,7 @@ public abstract class SQLStatement {
                 }
             }
             logger.severe(getSQL());
+            logger.log(Level.SEVERE, "PSQLException", e);
             throw new DataError(DataError.UNKNOWN_ERROR, "PSQLException");
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "SQLException", e);

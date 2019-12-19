@@ -1,11 +1,15 @@
 package nsu.fit.passing_car_backend.test;
 
+import nsu.fit.passing_car_backend.Helpers;
 import nsu.fit.passing_car_backend.Initializer;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class SearchTest {
     @BeforeClass
@@ -15,40 +19,24 @@ public class SearchTest {
 
     @Test
     public void test() throws IOException, ParseException {
-        /*String user_id = new RegistrationTest().registrateUser();
+        String user_id = new RegistrationTest().registrateUser();
         String ride_id = new CreateRideTest().createRide(user_id);
         JSONObject o1 = new GetRideTest().getRide(user_id, ride_id);
-        URL url = new URL("http://localhost:8080/search?" +
-                "time_start=" + o1.get("time_start") + "&" +
-                "lat_start=" + o1.get("lat_start") + "&" +
-                "lon_start=" + o1.get("lon_start") + "&" +
-                "lat_end=" + o1.get("lat_end") + "&" +
-                "lon_end=" + o1.get("lon_end") + "&" +
-                "radius_start=3&" +
-                "radius_end=3&" +
-                "time_needed=" + o1.get("time_start") + "&" +
-                "time_delta=1");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        JSONObject data = new JSONObject();
+        data.put("lat_start", o1.get("lat_start"));
+        data.put("lon_start", o1.get("lon_start"));
+        data.put("lat_end", o1.get("lat_end"));
+        data.put("lon_end", o1.get("lon_end"));
+        data.put("radius_start", 3.0);
+        data.put("radius_end", 3.0);
+        data.put("time_needed", o1.get("time_start"));
+        data.put("time_delta", 1.0);
+        String url = "http://localhost:8080/search" + Helpers.makeQuery(data);
+        HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
         con.setRequestProperty("Authorization", user_id);
         con.setRequestMethod("GET");
-        System.out.println(con.getResponseCode());
-        System.out.println(con.getResponseMessage());
-
-        //con.setDoInput(true);
-        //con.connect();
-        InputStream i;
-        try {
-        i = con.getInputStream();
-        } catch (IOException e){
-            i = con.getErrorStream();
-            System.out.println(i == null);
-            System.out.println(new String(i.readAllBytes()));
-            return;
-        }
-        ByteArrayOutputStream o = new ByteArrayOutputStream();
-        i.transferTo(o);
-        JSONObject o2 = (JSONObject) new JSONParser().parse(o.toString("UTF-8"));
+        JSONObject o2 = Helpers.getJSON(con);
         System.out.println(o1.toString());
-        System.out.println(o2.toString());*/
+        System.out.println(o2.toString());
     }
 }
