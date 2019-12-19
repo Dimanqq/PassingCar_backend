@@ -5,7 +5,7 @@ import io.undertow.server.HttpServerExchange;
 import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.SQLStatement;
 import nsu.fit.passing_car_backend.ServerUtils;
-import nsu.fit.passing_car_backend.dal.GetRidesMemberStatement;
+import nsu.fit.passing_car_backend.dal.GetMembersRideStatement;
 
 public class GetMembersRideHandler implements HttpHandler {
     private ServerUtils serverUtils;
@@ -19,7 +19,7 @@ public class GetMembersRideHandler implements HttpHandler {
         try {
             SQLStatement.Map data = new SQLStatement.Map();
             data.put("ride_id", exchange.getQueryParameters().get("id").getFirst());
-            data = serverUtils.sqlConnection.runStatement(data, new GetRidesMemberStatement());
+            data = serverUtils.sqlConnection.runStatement(data, new GetMembersRideStatement());
             exchange.setStatusCode(200);
             exchange.getResponseSender().send(data.toJSON().toString());
         } catch (DataError e) {
