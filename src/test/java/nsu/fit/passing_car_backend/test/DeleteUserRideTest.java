@@ -37,7 +37,7 @@ public class DeleteUserRideTest {
         }
         assertEquals(202, con.getResponseCode());
         JSONArray list = new GetMembersRideTest().getMembers(rideId, creatorId);
-        assertEquals(0, list.size());
+        assertEquals(1, list.size());
         stream.close();
         con.disconnect();
     }

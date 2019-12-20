@@ -1,5 +1,6 @@
 package nsu.fit.passing_car_backend.test;
 
+import nsu.fit.passing_car_backend.Helpers;
 import nsu.fit.passing_car_backend.Initializer;
 import org.json.simple.parser.ParseException;
 import org.junit.BeforeClass;
@@ -19,47 +20,30 @@ public class InviteRideTest {
 
     @Test
     public void test() throws IOException, ParseException {
-        invite();
-    }
-
-    private String invite() throws IOException, ParseException {
-        URL url;
-        String ride_id, user_id;
-        user_id = new RegistrationTest().registrateUser();
-        ride_id = new CreateRideTest().createRide(user_id);
-        url = new URL("http://localhost:8080/rides/" + ride_id + "/invite");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Authorization", user_id);
-        assertEquals(201, con.getResponseCode());
-        con.disconnect();
-        return ride_id;
+        String user_id = new RegistrationTest().registrateUser();
+        inviteUser(user_id);
     }
 
     String inviteUser(String user_id) throws IOException, ParseException {
-        URL url;
-        String ride_id;
-        String creator_id;
-        creator_id = new RegistrationTest().registrateUser();
-        ride_id = new CreateRideTest().createRide(creator_id);
-        url = new URL("http://localhost:8080/rides/" + ride_id + "/invite");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Authorization", user_id);
-        assertEquals(201, con.getResponseCode());
-        con.disconnect();
+        String creator_id = new RegistrationTest().registrateUser();
+        String ride_id = new CreateRideTest().createRide(creator_id);
+        inviteFull(user_id, ride_id);
         return ride_id;
     }
 
     String inviteRide(String ride_id) throws IOException, ParseException {
-        URL url;
         String member_id = new RegistrationTest().registrateUser();
-        url = new URL("http://localhost:8080/rides/" + ride_id + "/invite");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        inviteFull(member_id, ride_id);
+        return member_id;
+    }
+
+    private void inviteFull(String user_id, String ride_id) throws IOException, ParseException {
+        HttpURLConnection con = (HttpURLConnection) new URL("http://localhost:8080/rides/" + ride_id + "/invite")
+                .openConnection();
         con.setRequestMethod("POST");
-        con.setRequestProperty("Authorization", member_id);
+        con.setRequestProperty("Authorization", user_id);
+        //System.out.println(Helpers.getJSON(con));
         assertEquals(201, con.getResponseCode());
         con.disconnect();
-        return member_id;
     }
 }

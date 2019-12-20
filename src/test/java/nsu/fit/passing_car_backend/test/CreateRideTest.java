@@ -38,7 +38,7 @@ public class CreateRideTest {
         o.put("lon_start", 3298922.29);
         o.put("lon_end", 3200922.29);
         o.put("time_start", "2019-12-18T13:18:44.599Z");
-        o.put("places_count", 3L);
+        o.put("places_count", 4L);
         Helpers.putJSON(con, o);
         JSONObject res = Helpers.getJSON(con);
         assertNotNull(res.get("ride_id"));
@@ -51,7 +51,7 @@ public class CreateRideTest {
         assertEquals(o.get("lon_start"), or.get("lon_start"));
         assertEquals(o.get("lon_end"), or.get("lon_end"));
         assertEquals(o.get("places_count"), or.get("places_count"));
-        //assertEquals(o.get("lat_start"), or.get("lat_start"));
+        //assertEquals(o.get("time_start"), or.get("time_start"));
         return ride_id;
     }
 

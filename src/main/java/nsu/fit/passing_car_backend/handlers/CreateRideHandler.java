@@ -7,6 +7,7 @@ import nsu.fit.passing_car_backend.dal.CreateRideStatement;
 import nsu.fit.passing_car_backend.DataError;
 import nsu.fit.passing_car_backend.SQLStatement;
 import nsu.fit.passing_car_backend.ServerUtils;
+import nsu.fit.passing_car_backend.dal.InviteRideAddStatement;
 
 public class CreateRideHandler implements HttpHandler {
     private ServerUtils serverUtils;
@@ -32,8 +33,13 @@ public class CreateRideHandler implements HttpHandler {
             data.put("end_id",
                     serverUtils.sqlConnection.runStatement(locationEnd, new AddPointStatement()).value()
             );
-            data.put("creator_id", exchange.getRequestHeaders().get("Authorization").getFirst());
+            String user_id = exchange.getRequestHeaders().get("Authorization").getFirst();
+            data.put("creator_id", user_id);
             data = serverUtils.sqlConnection.runStatement(data, new CreateRideStatement());
+            SQLStatement.Map inv = new SQLStatement.Map();
+            inv.put("user_id", user_id);
+            inv.put("ride_id", data.get("ride_id"));
+            serverUtils.sqlConnection.runStatement(inv, new InviteRideAddStatement());
             exchange.setStatusCode(201);
             exchange.getResponseSender().send(data.toJSON().toString());
         } catch (DataError e) {

@@ -35,12 +35,12 @@ public class GetMembersRideTest {
         id3 = new InviteRideTest().inviteRide(rideId);
 
         JSONArray list = getMembers(rideId, creatorId);
-        for (Object it : list
-        ) {
+        for (Object it : list) {
             JSONObject o = (JSONObject) it;
             assertTrue(o.get("id").equals(id1)
                     || o.get("id").equals(id2)
-                    || o.get("id").equals(id3));
+                    || o.get("id").equals(id3)
+                    || o.get("id").equals(creatorId));
         }
 
     }

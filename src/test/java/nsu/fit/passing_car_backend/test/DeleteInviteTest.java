@@ -26,7 +26,7 @@ public class DeleteInviteTest {
         String rideId = new CreateRideTest().createRide(creatorId);
         String memberId = new InviteRideTest().inviteRide(rideId);
         JSONArray list = new GetMembersRideTest().getMembers(rideId, creatorId);
-        assertEquals(1, list.size());
+        assertEquals(2, list.size());
         url = new URL("http://localhost:8080/rides/" + rideId + "/invite");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("DELETE");
@@ -39,7 +39,7 @@ public class DeleteInviteTest {
         }
         assertEquals(202, con.getResponseCode());
         list = new GetMembersRideTest().getMembers(rideId, creatorId);
-        assertEquals(0, list.size());
+        assertEquals(1, list.size());
         stream.close();
         con.disconnect();
     }
