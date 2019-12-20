@@ -20,7 +20,7 @@ public class GetRidesMemberStatement extends SQLStatement {
     @Override
     protected String getSQL() {
         return "SELECT " +
-                "r.time_start, " +
+                "to_json(r.time_start)#>>'{}', " +
                 "r.places_count, " +
                 "r.creator_id::text, " +
                 "r.id::text, " +

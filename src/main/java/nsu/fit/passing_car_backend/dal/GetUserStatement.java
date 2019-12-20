@@ -18,6 +18,7 @@ public class GetUserStatement extends SQLStatement {
     @Override
     protected String getSQL() {
         return "SELECT " +
+                "\"user\".id::text, " +
                 "\"user\".email, " +
                 "\"user\".first_name, " +
                 "\"user\".last_name, " +
@@ -34,10 +35,11 @@ public class GetUserStatement extends SQLStatement {
                 throw new DataError(DataError.NOT_FOUND, "User not found");
             }
             user = new Map();
-            user.put("email", res.getString(1));
-            user.put("first_name", res.getString(2));
-            user.put("last_name", res.getString(3));
-            user.put("phone", res.getString(4));
+            user.put("id", res.getString(1));
+            user.put("email", res.getString(2));
+            user.put("first_name", res.getString(3));
+            user.put("last_name", res.getString(4));
+            user.put("phone", res.getString(5));
         }
         return user;
     }
