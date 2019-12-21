@@ -15,7 +15,7 @@ public class GetRidesMemberHandler implements HttpHandler {
     }
 
     @Override
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
+    public void handleRequest(HttpServerExchange exchange) {
         try {
             SQLStatement.Map data = new SQLStatement.Map();
             data.put("user_id", exchange.getQueryParameters().get("id").getFirst());

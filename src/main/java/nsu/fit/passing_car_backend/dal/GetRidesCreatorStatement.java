@@ -25,7 +25,8 @@ public class GetRidesCreatorStatement extends SQLStatement {
                 "point_start.lat, " +
                 "point_start.lon, " +
                 "point_end.lat, " +
-                "point_end.lon " +
+                "point_end.lon, " +
+                "ride.id::text " +
                 "FROM ride " +
                 "JOIN (SELECT point.lat, point.lon, point.id FROM point) AS point_start ON point_start.id = ride.point_start " +
                 "JOIN (SELECT point.lat, point.lon, point.id FROM point) AS point_end ON point_end.id = ride.point_end " +
@@ -46,6 +47,7 @@ public class GetRidesCreatorStatement extends SQLStatement {
                 ride.put("lon_start", res.getDouble(5));
                 ride.put("lat_end", res.getDouble(6));
                 ride.put("lon_end", res.getDouble(7));
+                ride.put("ride_id", res.getString(8));
                 rideList.add(ride);
             }
             return Map.oneValue("rides", rideList);
