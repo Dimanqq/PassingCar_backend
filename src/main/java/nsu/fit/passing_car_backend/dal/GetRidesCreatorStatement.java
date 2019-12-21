@@ -50,7 +50,10 @@ public class GetRidesCreatorStatement extends SQLStatement {
                 ride.put("ride_id", res.getString(8));
                 rideList.add(ride);
             }
-            return Map.oneValue("rides", rideList);
+            Map result = new Map();
+            result.put("rides", rideList);
+            result.put("user_id", data.get("user_id"));
+            return result;
         }
     }
 }

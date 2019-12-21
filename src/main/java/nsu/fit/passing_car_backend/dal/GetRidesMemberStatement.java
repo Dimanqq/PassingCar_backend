@@ -53,7 +53,10 @@ public class GetRidesMemberStatement extends SQLStatement {
                 ride.put("lon_end", res.getDouble(8));
                 rideList.add(ride);
             }
-            return Map.oneValue("rides", rideList);
+            Map result = new Map();
+            result.put("rides", rideList);
+            result.put("user_id", data.get("user_id"));
+            return result;
         }
     }
 }
